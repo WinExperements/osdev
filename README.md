@@ -3,7 +3,7 @@ A simple hobby operation system written in C and assembly
 # About
 A hobby operation system written in C and assembly.
 # Features
-Currently i implement microkernel for this operation system, because it's easily to realize. Yes microkernel shows that monolithic, but it's a my operation system :)
+Currently i implement microkernel for this operation system, because it's easily to realize. Yes microkernel slows that monolithic, but it's a my operation system :)<br>
 Current list of features and released components:
 - [x] Global description table
 - [x] Interrupts
