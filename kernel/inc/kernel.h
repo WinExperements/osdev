@@ -3,6 +3,6 @@
 #include "printk.h"
 #include "typedefs.h"
 void panic(char *msg);
-extern void kmain(const void *,u32);
+extern void kmain(struct muliboot_info *);
 void kernel_shutdown();
 #endif
