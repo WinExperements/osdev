@@ -9,7 +9,7 @@ extern void callConstructors() {
 	for(constructor* i = &start_ctors; i != &end_ctors; i++)
         (*i)();
 }
-extern void kmain(const void *multiboot,u32 magic) {
+extern void kmain(struct multiboot_info *info) {
 	arch_setup();
 	printk("Helin kernel version 0.1, booted on x86 CPU\n");
 	printk("Memory low: ");
