@@ -8,7 +8,7 @@ Currently i implement microkernel for this operation system, because it's easily
 Current list of features and released components:
 - [x] Global description table
 - [x] Interrupts
-- [x] Small realisation of Memory Management
+- [x] Memory Management
 - [ ] Multitasking
 - [ ] Module Loading
 - [ ] Multiboot structure loading
