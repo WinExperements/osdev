@@ -18,8 +18,11 @@
 #define WHITE         15
 #define PRINTK_INFO 1
 #define PRINTK_ERR 2
+#include "typedefs.h"
 void printk_init();
 void printk_clear();
 void printk(char *msg);
 void printkDec(int num);
+void printkPos(int,int,char *);
+void printkHex(u8 u);
 #endif
