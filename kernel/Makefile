@@ -2,7 +2,7 @@ CCPARAMS=-m32 -nostdlib -fno-builtin -fno-exceptions -fno-leading-underscore -Ii
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
-objects = src/x86/start.o src/x86/io.o src/x86/printk.o src/main.o src/panic.o src/x86/gdts.o src/x86/gdt.o src/x86/arch.o src/x86/interrupts.o src/x86/interrupt.o src/x86/idt.o src/mm.o
+objects = src/x86/start.o src/x86/io.o src/x86/printk.o src/main.o src/panic.o src/x86/gdts.o src/x86/gdt.o src/x86/arch.o src/x86/interrupts.o src/x86/interrupt.o src/x86/idt.o src/mm.o src/x86/timer.o 
 %.o: %.c
 	cc $(CCPARAMS) -o $@ $<
 %.o: %.s
@@ -26,3 +26,5 @@ iso:
 	echo '}'                                 >> iso/boot/grub/grub.cfg
 	grub-mkrescue --output=mykernel.iso iso
 	rm -rf iso
+deps:
+	@sudo apt update && sudo apt install nasm gcc xorriso grub-common qemu-system-x86 -y
