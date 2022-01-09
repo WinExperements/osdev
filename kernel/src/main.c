@@ -1,6 +1,7 @@
 #include "printk.h"
 #include "kernel.h"
 #include "arch.h"
+#include "mm.h"
 typedef void (*constructor)();
 constructor start_ctors;
 constructor end_ctors;
@@ -11,7 +12,18 @@ extern void callConstructors() {
 extern void kmain(const void *multiboot,u32 magic) {
 	arch_setup();
 	printk("Helin kernel version 0.1, booted on x86 CPU\n");
-	kernel_shutdown();
+	printk("Memory low: ");
+	printkDec(info->low_mem);
+	printk("\nMemory high: ");
+	printkDec(info->high_mem);
+	mm_init(info->low_mem/1024,(info->high_mem-info->low_mem)*1024);
+        char *arr = kmalloc(1024);
+	if (arr != 0) {
+		printk("Test passed, now freeing allocated pages!\n");
+		kfree(arr);
+	} else {
+		panic("TEST FAIL!\n");
+	}
 }
 void kernel_shutdown() {
 	printk("Kernel shutdown in progress!\n");
