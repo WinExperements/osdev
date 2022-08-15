@@ -1,0 +1,12 @@
+D:\MinGW\bin\mingw32-make.exe -f D:\info\myos\Makefile --dry-run --keep-going --print-directory
+mingw32-make: Entering directory 'd:/info/myos'
+ 
+mingw32-make: D:\info\myos\Makefile: No such file or directory
+
+mingw32-make: *** No rule to make target 'D:\info\myos\Makefile'.
+mingw32-make: Failed to remake makefile 'D:\info\myos\Makefile'.
+
+mingw32-make: Leaving directory 'd:/info/myos'
+ 
+mingw32-make: *** No targets specified and no makefile found.  Stop.
+

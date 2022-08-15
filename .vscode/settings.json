@@ -1,0 +1,17 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.default.includePath": [
+        ".\\inc",
+        "D:\\MinGW\\include"
+    ],
+    "C_Cpp.default.browse.path": [
+        ".\\inc",
+        "D:\\MinGW\\include"
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
+    "makefile.makePath": "D:\\MinGW\\bin\\mingw32-make",
+    "makefile.makefilePath": "D:\\info\\myos\\Makefile",
+    "makefile.configurations": [
+    
+    ]
+}

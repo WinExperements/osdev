@@ -1,0 +1,292 @@
+D:\MinGW\bin\mingw32-make.exe all -f D:\info\myos\Makefile --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.82.90
+# Built for i686-pc-mingw32
+# Copyright (C) 1988-2012 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+mingw32-make: D:\info\myos\Makefile: No such file or directory
+mingw32-make: *** No rule to make target 'D:\info\myos\Makefile'.  Stop.
+
+
+# Make data base, printed on Mon Aug 15 11:27:58 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
+# automatic
+?F = $(notdir $?)
+# environment
+OMP_WAIT_POLICY = PASSIVE
+# default
+.SHELLFLAGS := -c
+# environment
+ANDROID_NDK_ROOT = D:\Sdk\ndk
+# makefile
+MAKEFLAGS = Rrp
+# automatic
+?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
+# automatic
+@D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
+# makefile
+CURDIR := d:/info/myos
+# default
+SHELL := sh.exe
+# environment
+WINDIR = C:\Windows
+# environment
+VSCODE_NLS_CONFIG = {"locale":"uk","availableLanguages":{},"_languagePackSupport":true}
+# environment
+ONEDRIVE = C:\Users\user\OneDrive
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile
+MAKEFILE_LIST := 
+# environment
+TMP = C:\Users\user\AppData\Local\Temp
+# environment
+PROGRAMW6432 = C:\Program Files
+# environment
+PROGRAMDATA = C:\ProgramData
+# environment
+VSCODE_CWD = D:\Programs\Microsoft VS Code
+# environment
+PATH = D:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Intel\TXE Components\TCS\;C:\Program Files\Intel\TXE Components\TCS\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;D:\Program Files\CMake\bin;D:\Program Files\nodejs\;D:\Program Files\Git\cmd;C:\Program Files (x86)\Intel\TXE Components\TCS\;C:\Program Files\Intel\TXE Components\TCS\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Users\user\AppData\Local\Microsoft\WindowsApps;C:\Users\user\.dotnet\tools;D:\Sdk\ndk\23.1.7779620;D:\Sdk\tools;C:\Users\user\adb;D:\Program Files\qemu;D:\Programs\Microsoft VS Code\bin;C:\Users\user\AppData\Roaming\npm;D:\MinGW\bin;D:\gcc\bin;
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# environment
+PROCESSOR_ARCHITECTURE = x86
+# environment
+USERPROFILE = C:\Users\user
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# environment
+NUMBER_OF_PROCESSORS = 2
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver
+# automatic
+%F = $(notdir $%)
+# environment
+EDPATH = C:\WATCOM\EDDAT
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_11724_IKRDTZAIKAPZUPKV
+# environment
+COMPUTERNAME = WIN-P5I0UJLP4KM
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+COCOS_TEMPLATES_ROOT = D:\Download\cocos\templates
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+USERNAME = user
+# environment
+PUBLIC = C:\Users\Public
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\user\AppData\Roaming\Code\CachedData\6d9b74a70ca9c7733b29f0456fd8195364076dda
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
+# environment
+LOGONSERVER = \\WIN-P5I0UJLP4KM
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# environment
+USERDOMAIN = WIN-P5I0UJLP4KM
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# environment
+JAVA_HOME = D:\Program Files\Android\Android Studio\jre
+# default
+MAKE_VERSION := 3.82.90
+# makefile
+.DEFAULT_GOAL := 
+# environment
+INCLUDE = C:\WATCOM\H;C:\WATCOM\H\NT;C:\WATCOM\H\NT\DIRECTX;C:\WATCOM\H\NT\DDK
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# automatic
+%D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
+# environment
+COCOS_CONSOLE_ROOT = D:\Download\cocos\tools\cocos2d-console\bin
+# environment
+LOCALAPPDATA = C:\Users\user\AppData\Local
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+# environment
+COCOS_X_ROOT = D:\Download
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 55 Stepping 8, GenuineIntel
+# environment
+OS = Windows_NT
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\680802a3ebd40da3f83beb9d3e841b70-1.70.1-main-sock
+# environment
+KMP_BLOCKTIME = 0
+# environment
+HOMEPATH = \Users\user
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -Rrp
+# automatic
+*D = $(patsubst %/,%,$(patsubst %\,%,$(dir $*)))
+# environment
+SYSTEMROOT = C:\Windows
+# automatic
++D = $(patsubst %/,%,$(patsubst %\,%,$(dir $+)))
+# automatic
++F = $(notdir $+)
+# environment
+APPDATA = C:\Users\user\AppData\Roaming
+# environment
+TEMP = C:\Users\user\AppData\Local\Temp
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# default
+MAKE_COMMAND := D:/MinGW/bin/mingw32-make
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+ANDROID_SDK_ROOT = D:\Sdk
+# environment
+LC_ALL = C
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+SYSTEMDRIVE = C:
+# environment
+NDK_ROOT = D:\Sdk\ndk\21.1.6352462
+# environment
+SESSIONNAME = Console
+# environment
+PROCESSOR_REVISION = 3708
+# environment
+MOZ_PLUGIN_PATH = C:\Program Files (x86)\Foxit Reader\plugins\
+# default
+.RECIPEPREFIX := 
+# environment
+LANG = C
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+VSCODE_PID = 11724
+# environment
+USERDOMAIN_ROAMINGPROFILE = WIN-P5I0UJLP4KM
+# variable set hash-table stats:
+# Load=95/1024=9%, Rehash=0, Collisions=12/108=11%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# C:\Program Files (x86)\Intel\TXE Components\TCS\ (key C:/Program Files (x86)/Intel/TXE Components/TCS/, mtime 1629892849): 16 files, no impossibilities.
+# C:\ProgramData\Oracle\Java\javapath (key C:/ProgramData/Oracle/Java/javapath, mtime 1655582245): 5 files, no impossibilities.
+# C:\Windows\System32\WindowsPowerShell\v1.0\ (key C:/Windows/System32/WindowsPowerShell/v1.0/, mtime 1621336464): 32 files, no impossibilities.
+# . (key d:/info/myos, mtime 1660481108): 18 files, no impossibilities.
+# D:\Programs\Microsoft VS Code\bin (key D:/Programs/Microsoft VS Code/bin, mtime 1660238677): 4 files, no impossibilities.
+# C:\Users\user\.dotnet\tools: could not be stat'd.
+# D:\gcc\bin (key D:/gcc/bin, mtime 1498965096): 30 files, no impossibilities.
+# D:\Program Files\Git\cmd (key D:/Program Files/Git/cmd, mtime 1660472538): 8 files, no impossibilities.
+# C:\Windows\System32\OpenSSH\: could not be stat'd.
+# D:\MinGW\bin (key D:/MinGW/bin, mtime 1660501255): 55 files, no impossibilities.
+# D:\Program Files\CMake\bin: could not be stat'd.
+# C:\Users\user\adb (key C:/Users/user/adb, mtime 1648991741): 6 files, no impossibilities.
+# C:\Windows (key C:/Windows, mtime 1659974211): 116 files, no impossibilities.
+# C:\Program Files\Intel\TXE Components\TCS\ (key C:/Program Files/Intel/TXE Components/TCS/, mtime 1629892849): 18 files, no impossibilities.
+# D:\Program Files\qemu (key D:/Program Files/qemu, mtime 1656833152): 156 files, no impossibilities.
+# D:\Sdk\tools (key D:/Sdk/tools, mtime 1650715720): 14 files, no impossibilities.
+# C:\Windows\System32\Wbem (key C:/Windows/System32/Wbem, mtime 1649014305): 172 files, no impossibilities.
+# D:\Sdk\ndk\23.1.7779620 (key D:/Sdk/ndk/23.1.7779620, mtime 1650713876): 22 files, no impossibilities.
+# D:\Program Files\nodejs\ (key D:/Program Files/nodejs/, mtime 1660237421): 13 files, no impossibilities.
+# C:\Windows\system32 (key C:/Windows/system32, mtime 1659254493): 3093 files, no impossibilities.
+# C:\Users\user\AppData\Roaming\npm (key C:/Users/user/AppData/Roaming/npm, mtime 1660237413): 2 files, no impossibilities.
+# C:\Program Files\dotnet\ (key C:/Program Files/dotnet/, mtime 1652193673): 3 files, no impossibilities.
+# D:\Program Files (x86)\VMware\VMware Workstation\bin\ (key D:/Program Files (x86)/VMware/VMware Workstation/bin/, mtime 1658355158): 4 files, no impossibilities.
+# C:\Users\user\AppData\Local\Microsoft\WindowsApps (key C:/Users/user/AppData/Local/Microsoft/WindowsApps, mtime 1649173905): 11 files, no impossibilities.
+
+# 3798 files, no impossibilities in 24 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+all:
+#  Command line target.
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+D:\info\myos\Makefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# files hash-table stats:
+# Load=4/1024=0%, Rehash=0, Collisions=0/14=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 7 (6) / strings = 3741 / storage = 56852 B / avg = 15 B
+# current buf: size = 8174 B / used = 7854 B / count = 465 / avg = 16 B
+# other used: total = 48678 B / count = 3276 / avg = 14 B
+# other free: total = 46 B / max = 14 B / min = 1 B / avg = 7 B
+
+# strcache performance: lookups = 3828 / hit rate = 2%
+# hash-table stats:
+# Load=3741/8192=46%, Rehash=0, Collisions=1455/3828=38%
+# Finished Make data base on Mon Aug 15 11:27:58 2022
+
+ 
