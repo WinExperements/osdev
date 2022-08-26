@@ -24,6 +24,7 @@ Current list of features and released components:
 - Install any cross-compiler
 - Install ```grub-common xorriso grub-efi-ia32```
 - If you don't use Windows, then replace all ```\\``` to ```/``` in Makefile, in userland/libc and userland/init Makefiles
+- Go to src folder
 - Type "make" or if you use Windows, type "mingw32-make"
 - If you in Windows you need to install any Linux distribution using virtual machine to make ISO, if not just type "make makeiso"
 - If you don't need to create ISO just go to init folder in userland and type ```qemu-system-i386 -kernel ../../src/kernel.bin -initrd init```, if you in Windows replace ```/``` to ```\```
