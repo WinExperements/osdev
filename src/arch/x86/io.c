@@ -7,8 +7,11 @@ uint8_t io_readPort(uint32_t port) {
       asm("inb %w1, %b0": "=a"(result):"Nd"(port));
 	return result;
 }
-uint16_t io_readPort16(uint32_t port) {
+void io_writePortW(uint32_t port,uint16_t data) {
+     asm("outw %w0, %w1": :"a"(data), "Nd"(port));
+}
+uint16_t io_readPortW(uint32_t port) {
 	uint16_t result;
-      asm("inw %w1, %w0": "=a"(result):"Nd"(port));
+    asm("inb %w1, %b0": "=a"(result):"Nd"(port));
 	return result;
 }

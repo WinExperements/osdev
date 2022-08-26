@@ -5,7 +5,7 @@
 #include<arch.h>
 #include<dev.h>
 #include<mm/pmm.h>
-dev_t *tty;
+#include<keyboard.h>
 uint16_t cursor_x;
 uint16_t cursor_y;
 int initialized;
@@ -38,16 +38,12 @@ void terminal_initialize(struct multiboot_info *info) {
   #else
   ws_row = 25;
   ws_col = 80;
+  // disable cursor
+  io_writePort(0x3d4,0x0a);
+  io_writePort(0x3d5,0x20);
   #endif
 	psf_init();
 	terminal_clear();
-}
-void movecursor(uint16_t x,uint16_t y) {
-	uint16_t pos = y * 80 + x;
-	io_writePort(0x3D4,14);
-	io_writePort(0x3D5,pos>>16);
-	io_writePort(0x3D4,15);
-	io_writePort(0x3D5,pos);
 }
 void scroll() {
   if (cursor_y >= ws_row) {
@@ -72,12 +68,6 @@ void putc(char ch,uint32_t back,uint32_t color) {
   else if (ch == 0x09)
     {
       cursor_x = (cursor_x+8) & ~(8-1);
-    }
-
-  // Handle carriage return
-  else if (ch == '\r')
-    {
-      cursor_x = 0;
     }
 
   // Handle newline by moving cursor back to left and increasing the row
@@ -107,20 +97,12 @@ void putc(char ch,uint32_t back,uint32_t color) {
   scroll();
   terminal_printCursor(cursor_x,cursor_y);
 }
-void terminal_writestring(const char *c) {
-	int i =0;
-	while(c[i]) {
-		putc(c[i],0,0);
-		i++;
-	}
-	//write_serialString(c);
-}
 void terminal_clear() {
   #ifndef LEGACY_TERMINAL 
 	if (vgaW != 0) {
 		for (uint32_t y = 0; y < vgaH; ++y) {
       for (uint32_t x = 0; x < vgaW; ++x) {
-        vgaFramebuffer[x+y*vgaBpp] = vgaBack;
+        vgaFramebuffer[x+y*vgaW] = vgaBack;
       }
     }
 	}
@@ -130,85 +112,12 @@ void terminal_clear() {
 		}
   #endif
   cursor_x = cursor_y = 0;
-}
-void terminal_writeInt(int u) {
-	if (u == 0) {
-          terminal_writestring("0");
-          return;
-        }
-        s32 acc = u;
-        char c[32];
-        int i = 0;
-        while(acc > 0) {
-                c[i] = '0' + acc%10;
-                acc /= 10;
-                i++;
-        }
-        c[i] = 0;
-        char c2[32];
-        c2[i--] = 0;
-        int j = 0;
-        while(i >= 0) {
-                c2[i--] = c[j++];
-        }
-	terminal_writestring(c2);
-}
-void terminal_writeHex(int num) {
-	uint32_t tmp;
-	terminal_writestring("0x");
-	char noZeroes = 1;
-	int i;
-	for (i = 28; i > 0; i-=4) {
-		tmp = (num >> i) & 0xF;
-		if (tmp == 0 && noZeroes != 0) continue;
-		if (tmp >= 0xA) {
-			noZeroes = 0;
-			putc(tmp-0xA+'a',0,0);
-		} else {
-			noZeroes = 0;
-			putc(tmp+'0',0,0);
-		}
-	}
-	tmp = num & 0xF;
-	if (tmp >= 0xA) {
-		putc(tmp-0xA+'a',0,0);
-	} else {
-		putc(tmp+'0',0,0);
-	}
 } 
 void terminal_setcolor(uint32_t colo) {
        vgaFr = colo;
 }
 void terminal_setbackground(uint32_t back) {
   vgaBack = back;
-}
-void printf(char *format,...) {
-	va_list arg;
-	va_start(arg,format);
-	while (*format != '\0') {
-		if (*format == '%') {
-			if (*(format +1) == '%') {
-				terminal_writestring("%");
-			} else if (*(format + 1) == 's') {
-				terminal_writestring(va_arg(arg,char*));
-			} else if (*(format + 1) == 'c') {
-				putc(va_arg(arg,int),0,0);
-			} else if (*(format + 1) == 'd') {
-				terminal_writeInt(va_arg(arg,int));
-			} else if (*(format + 1) == 'x') {
-				terminal_writeHex(va_arg(arg,int));
-			} else if (*(format + 1) == '\0') {
-				PANIC("printf: next char is null!");
-			} else {
-				PANIC("Unknown %");
-			}
-			format++;
-		} else {
-			putc(*format,0,0);
-		}
-		format++;
-	}
-	va_end(arg);
 }
 int terminal_getX() {
 	return cursor_x;
@@ -218,11 +127,6 @@ int terminal_getY() {
 }
 int terminal_getBufferAddress() {
 	return (int)vgaFramebuffer;
-}
-void printf_syscall(const char *msg) {
-	int res;
-	int num = 1;
-	asm volatile("int $0x80" : "=a" (res) : "0" (num), "b" ((int)msg));
 }
 void terminal_enableReplay(bool enable) {
 	// Does we need to enable the replay to serial(Debug)
@@ -284,7 +188,7 @@ void putchar(
     }
     #else
 	/* print character into BIOS text buffer */
-	uint8_t attributeByte = (0 << 4) | (15 & 0x0f);
+	uint8_t attributeByte = (bg << 4) | (fg & 0x0f);
 	uint16_t attrib = attributeByte << 8;
 	uint16_t *location = video_memory + (cy * 80 + cx);
 	*location = c | attrib;
@@ -341,11 +245,7 @@ void terminal_clearWithColor(uint32_t back) {
   terminal_clear();
 }
 void terminal_printCursor(uint16_t x,uint16_t y) {
-#ifndef LEGACY_TERMINAL
   putchar(' ',x,y,vgaBack,vgaFr);
-#else
-  movecursor(x,y);
-#endif
 }
 void terminal_writeXY(char c,uint16_t x,uint16_t y) {
   putchar(' ',cursor_x,cursor_y,vgaFr,vgaBack);
@@ -355,15 +255,10 @@ void terminal_writeXY(char c,uint16_t x,uint16_t y) {
   terminal_printCursor(x,y);
 }
 int terminal_getBufferSize() {
+  #ifndef LEGACY_TERMINAL
   int size = vgaP*vgaH;
+  #else
+  int size = 80*20;
+  #endif
   return size;
-}
-void tty_write(void *buffer,int size) {
-  printf(buffer);
-}
-void tty_init() {
-  tty = pmml_alloc(true);
-  tty->name = "tty";
-  tty->write = tty_write;
-  dev_add(tty);
 }

@@ -1,0 +1,3 @@
+It's how we need to implement drivers in OS
+We need to add relocable ELF loading, to add drivers support
+Add support to the dynamic ELF loading

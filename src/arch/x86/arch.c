@@ -15,11 +15,19 @@ void arch_init(struct multiboot_info *info) {
 	interrupts_init();
 	interrupts_addHandler(13,gpf_exc);
 	uint32_t esp;
-        asm volatile("mov %%esp, %0" : "=r"(esp));
-        tss_set_stack(0x10,esp);
+    asm volatile("mov %%esp, %0" : "=r"(esp));
+    tss_set_stack(0x10,esp);
 }
 void arch_reset() {
-	__asm("jmp 0x0");
+    asm volatile ("cli"); /* disable all interrupts */
+ 
+   uint8_t good = 0x02;
+    while (good & 0x02)
+        good = io_readPort(0x64);
+    io_writePort(0x64, 0xFE);
+loop:
+    asm volatile ("hlt"); 
+	goto loop;
 }
 void panic(char *file,const char *funcName,const char *msg)
 {
@@ -34,16 +42,6 @@ void panic(char *file,const char *funcName,const char *msg)
 void gpf_exc(registers_t *r) {
 	printf("#GP error code: %d\n",r->error_code);
 	PANIC("#GP");
-}
-void arch_executeTask(int esp) {
-	asm volatile("mov %0,%%esp" : : "r" (esp));
-	asm volatile("popal");
-	asm volatile("sti");
-	asm volatile("iretl");
-}
-void arch_test(int oldesp,int newesp) {
-	asm volatile("movl %%esp,%0" : "=r" (oldesp));
-	asm volatile("movl %0,%%esp" : : "r" (newesp));
 }
 void arch_disableIRQ() {
 	io_writePort(0x21, 0xff);            // Disable all IRQs
@@ -81,4 +79,18 @@ void *arch_buildStack(int entryPoint,bool isUser) {
 	frame->ss = frame->ds;
 	frame->usersp = (isUser ? ((int)pmml_alloc(true)+1024) : 0);
 	return (void *)(int)frame;
+}
+void arch_disableInterrupts() {
+	asm volatile("cli");
+}
+void arch_enableInterrupts() {
+	asm volatile("sti");
+}
+void arch_poweroff() {
+	io_writePortW(0xB004, 0x2000);
+    io_writePortW(0x604, 0x2000);
+    io_writePortW(0x4004, 0x3400);
+    arch_disableInterrupts();
+    printf("HALT\n");
+    while (1){}
 }

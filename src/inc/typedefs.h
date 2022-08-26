@@ -3,10 +3,22 @@
 #include<multiboot.h>
 #define NULL 0
 #define BLACK         0
+#ifndef LEGACY_TERMINAL
 #define BLUE          0x0000FF
+#else
+#define BLUE          1
+#endif
+#ifndef LEGACY_TERMINAL
 #define GREEN         0x00FF00
+#else
+#define GREEN         2
+#endif
 #define CYAN          3
+#ifndef LEGACY_TERMINAL
 #define RED           0xFF0000
+#else
+#define RED           4
+#endif
 #define MAGENTA       5
 #define BROWN         6
 #define LIGHT_GREY    7
@@ -57,4 +69,10 @@ typedef struct {
     uint32_t height;        /* height in pixels */
     uint32_t width;         /* width in pixels */
 } PSF_font;
+typedef struct symbol
+{
+    char *name;
+    uint32_t value;
+} symbol_t;
+
 #endif

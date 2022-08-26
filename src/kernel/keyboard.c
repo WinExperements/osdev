@@ -82,18 +82,11 @@ void keyboard_handler(registers_t *regs) {
             case 0x39: keyboard_keyHandler(' '); break;
             case 0xe: {
                 terminal_writeXY(' ',terminal_getX()-1,terminal_getY());
+                keyboard_keyHandler('\b');
             } break;
             case 0x38: {
             } break;
             case 0x1d: {
-            } break;
-            case 0x29: {
-                void *add = pmml_allocPages(2,true);
-                printf("%x\n",add);
-               // pmml_freePages(add,2);
-            } break;
-            case 0x2b: {
-                printf("%x\n",pmml_alloc(false));
             } break;
             case 0x28: keyboard_keyHandler('\''); break;
             default:
@@ -111,7 +104,9 @@ char keyboard_get() {
 	return keyCode;
 }
 void keyboard_keyHandler(char key) {
-	printf("%c",key);
+    if (key != '\b') {
+        printf("%c",key);
+    }
     hasKey = true;
     keyCode = key;
 }

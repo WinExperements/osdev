@@ -1,10 +1,16 @@
 #include "stdlib.h"
+#include "syscall.h"
 int getpid() {
-	int res = 0;
-	asm volatile("int $0x80" : "=a" (res) : "0" (4));
-	return res;
+	return helin_syscall(4,0,0,0,0,0);
 }
 void exit(int exitcode) {
-	int res = 0;
-	asm volatile("int $0x80" : "=a"(res) : "0" (2));
+	helin_syscall(2,exitcode,0,0,0,0);
+	for (;;) {}
+}
+void *malloc(int size) {
+	return (void *)helin_syscall(11,(size/4096)+1,0,0,0,0);
+}
+/* Need to be fixed and need to be added in program page tracking */
+void free(void *address,int pages) {
+	helin_syscall(12,(int)address,pages,0,0,0);
 }

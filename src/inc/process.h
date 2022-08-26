@@ -38,6 +38,9 @@ struct process {
   msg_t messages[10];
   int message_count;
   int wait_time;
+  int parent;
+  struct process *child;
+  int lAddr;
 };
 extern struct process *runningTask;
 void process_init();
@@ -59,4 +62,7 @@ void process_update(int pid,struct process *to);
 void process_block(int pid);
 void process_unblock(int pid);
 void process_wait(int pid,int ms);
+/* Wait for any child process if the pid are -1 */
+void process_waitPid(int pid);
+void process_yield();
 #endif

@@ -20,4 +20,5 @@ void terminal_writeXY(char c,uint16_t x,uint16_t y);
 void terminal_printCursor(uint16_t x,uint16_t y);
 int terminal_getBufferSize();
 void tty_init();
+void putc(char c,uint32_t,uint32_t);
 #endif

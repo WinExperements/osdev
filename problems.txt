@@ -1,0 +1,3 @@
+This file contains bugs and errors found while developing the kernel, now start listing the problems.
+1. pmml_allocPages and pmml_alloc returns diffirent addresses.
+2. My rootfs seems broken.

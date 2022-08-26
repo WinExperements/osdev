@@ -1,2 +1,7 @@
 # libc
-Realization of libc for HelinOS, only add exit and printf
+Realization of libc for HelinOS
+Function that supported:
+- printf
+- fopen
+- exit
+- malloc

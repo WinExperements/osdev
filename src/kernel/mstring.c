@@ -1,4 +1,5 @@
 #include<mstring.h>
+#include<mm/pmm.h>
 void memcpy(void *vd, const void *vs, unsigned length) {
 	char *d = vd;
 	const char *s = vs;
@@ -27,4 +28,57 @@ bool strcmp(char *s1,char *s2) {
 	} else {
 		return false;
 	}
+}
+bool strcpy(char *to,char *from) {
+	int i = strlen(from);
+	for (int u = 0; u < i; u++) {
+		to[u] = from[u];
+	}
+	return true;
+}
+const char *strchr(const char *s, char ch)
+{
+	while(*s) {
+		if(*s == ch)
+			return s;
+		s++;
+	}
+	return 0;
+}
+
+char *strtok(char *s, const char *delim)
+{
+	static char *oldword = 0;
+	char *word;
+
+	if(!s)
+		s = oldword;
+
+	while(*s && strchr(delim, *s))
+		s++;
+
+	if(!*s) {
+		oldword = s;
+		return 0;
+	}
+
+	word = s;
+	while(*s && !strchr(delim, *s))
+		s++;
+
+	if(*s) {
+		*s = 0;
+		oldword = s + 1;
+	} else {
+		oldword = s;
+	}
+
+	return word;
+}
+char *strdup(char *src) {
+	int len = strlen(src);
+	char *p = pmml_allocPages((len/4096)+1,true);
+	if (!p) return NULL;
+	memcpy(p,src,len);
+	return p;
 }

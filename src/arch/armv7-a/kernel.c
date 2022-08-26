@@ -8,7 +8,10 @@ void write_string_uart(char *message) {
         write_uart(*message++);
     }
 }
-void kernel_main() {
+void arch_setup(void *unused) {
     // our entry point, currently
     write_string_uart("HelinOS ARM\r\n");
+}
+void kernel_main(void *unsued) {
+    write_string_uart("Kernel main!\n");
 }

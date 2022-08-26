@@ -52,12 +52,8 @@ void vmm_pfault(registers_t *regs) {
   bool us = regs->error_code & 0x4;
   bool reserved = regs->error_code & 0x8;
   bool fetch = regs->error_code & 0x10;
-  #ifndef LEGACY_TERMINAL
   printf("Page fault at %x, detailed info\n",addr);
   printf("Present: %d\nRW: %d\nUser: %d\nReserved: %d\nFetch: %d\n",present,rw,us,reserved,fetch);
-  #else
-  write_serialString("PAGE fault\r\n");
-  #endif
   while(1) {}
 }
 void vmm_enable() {
