@@ -45,7 +45,7 @@ void atapi_identify(bool master,int port) {
         status = io_readPort(commandPort);
     }
     if (status & 0x1) {
-        printf("ATA detection error!\n");
+        printf("ATA error.");
         goto notFound;
     }
     printf("ok\n");

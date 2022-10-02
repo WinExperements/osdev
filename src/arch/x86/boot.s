@@ -42,6 +42,11 @@ _start:
 	call arch_init
 	pushl %ebx
 	call kernel_main
+	/* Issue description:
+        Remove this if you wana add the switch to user mode function,
+        because we receive #GF if don't do that, Thank you
+        - Sergij Yevchuk*/
+	#sti
 1:
 	jmp 1b
  

@@ -3,4 +3,5 @@
 #include<typedefs.h>
 void kshell_main();
 void kshell_init(multiboot_info_t *i);
+bool exec_init();
 #endif

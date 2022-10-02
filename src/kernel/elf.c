@@ -5,6 +5,7 @@
 #include<mstring.h>
 #include<x86/vmm_x86.h>
 #include<module.h>
+#include<arch.h>
 bool elf_check_file(Elf32_Ehdr *hdr) {
     if (!hdr) {
         printf("elf: given header are null\n");
@@ -29,7 +30,7 @@ bool elf_check_file(Elf32_Ehdr *hdr) {
     return true;
 }
 /* Load elf then automatically create process */
-bool elf_load_file(void *file,bool isUser,char *name) {
+bool elf_load_file(void *file,bool isUser,char *name,int argc,char **argv,char **envp) {
     int pe;
     Elf32_Ehdr *header = (Elf32_Ehdr *)file;
     if (!elf_check_file(header)) {
@@ -56,37 +57,60 @@ bool elf_load_file(void *file,bool isUser,char *name) {
     if (header->e_machine != 3) {
         printf("elf: trying to execute non i386 executable\n");
     }
-    Elf32_Phdr *p_entry = (file+header->e_phoff);
     int *dir = NULL;
     int pages_s = 0;
-    for (pe = 0; pe < header->e_phnum; pe++,p_entry++) {
+    size_t elf_base = (size_t)header;
+    int page_start = 0;
+    for (pe = 0; pe < header->e_phnum; pe++) {
+        Elf32_Phdr *p_entry = (void *)(header->e_phoff + elf_base + pe * header->e_phentsize);
         if (p_entry->p_type == 1) {
             if (p_entry->p_memsz == 0) {
                 continue; // skip
             }
             if (dir == 0) {
                 dir = vmm_createDirectory();
-                pages_s+=3;
+                pages_s+=2;
+            }
+             if (page_start == 0) {
+                page_start = (int)dir;
             }
             int pages = (p_entry->p_memsz/4096)+1;
-            void *section = (void *)(file+p_entry->p_offset);
+            pages_s+=pages;
+            void *section = (void *)(elf_base+p_entry->p_offset);
             void *to = pmml_allocPages(pages,true);
+            int vaddr = p_entry->p_vaddr;
+            if (page_start == 0) {
+                page_start = vaddr;
+            }
+            int *table = pmml_alloc(true);
+            pages_s+=2;
             memcpy(to,section,p_entry->p_memsz);
             for (int i = 0; i < pages; i++) {
-                int addr = ((int)to)+i * 4096;
-                int *table = pmml_alloc(true);
-                if (table == NULL) {
-                    printf("%s: cannot init virtual memory for process\n",__func__);
-                    return false;
-                }
-                vmm_map(table,addr,p_entry->p_vaddr);
-                dir[PAGE_DIRECTORY_INDEX(p_entry->p_vaddr)] = ((unsigned int)table) | 7;
-                pages_s++;
+                int addr = ((int)to)+(i*4096);
+                vmm_map(table,addr,vaddr);
+                vaddr+=4096;
             }
+            dir[PAGE_DIRECTORY_INDEX(vaddr)] = ((unsigned int)table) | 7;
         }
     }
     struct process *p = process_create(header->e_entry,isUser,name);
+    if (!p) {
+        pmml_freePages((void *)page_start,pages_s);
+    }
     p->dir = (uint32_t)dir;
     p->pages = pages_s;
+    p->page_start = page_start;
+    if (argc == 0 || argv == 0) {
+        char **argva = pmml_alloc(true); // arguments
+        argva[0] = "<unknown>";
+        argva[1] = "init";
+        if (envp == NULL) {
+             envp = pmml_alloc(true);
+            envp[0] = "PATH=/bin";
+        }
+        arch_copy_process_args(p,2,argva,envp);
+    } else {
+        arch_copy_process_args(p,argc,argv,envp);
+    }
     return true;
 }

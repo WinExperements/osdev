@@ -76,7 +76,7 @@ void keyboard_handler(registers_t *regs) {
             case 0x32: keyboard_keyHandler('m'); break;
             case 0x33: keyboard_keyHandler(','); break;
             case 0x34: keyboard_keyHandler('.'); break;
-            case 0x35: keyboard_keyHandler('-'); break;
+            case 0x35: keyboard_keyHandler('/'); break;
 
             case 0x1C: keyboard_keyHandler('\n'); break;
             case 0x39: keyboard_keyHandler(' '); break;
@@ -91,6 +91,7 @@ void keyboard_handler(registers_t *regs) {
             case 0x28: keyboard_keyHandler('\''); break;
             default:
             {
+                printf("Unhandled key: %x\n",key);
                 break;
             }
 	}

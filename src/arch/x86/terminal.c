@@ -47,8 +47,18 @@ void terminal_initialize(struct multiboot_info *info) {
 }
 void scroll() {
   if (cursor_y >= ws_row) {
-    terminal_clear();
-    cursor_x = cursor_y = 0;
+    #ifdef LEGACY_TERMINAL
+    for (int i = 0*80; i < 24*80; ++i) {
+      video_memory[i] = video_memory[i+80];
+    }
+    for (int i = 24*80; i < 25*80; ++i) {
+      video_memory[i] = 0x20 | (((vgaBack << 4) | (vgaFr & 0x0f)) << 8);
+    }
+    cursor_y = 24;
+    #else
+    terminal_clear(); // we don't support it
+    cursor_y = cursor_x = 0;
+    #endif
     #ifndef LEGACY_TERMINAL
     putchar(' ',0,0,vgaBack,vgaFr);
     #endif
@@ -94,6 +104,9 @@ void putc(char ch,uint32_t back,uint32_t color) {
     }
 
   // Scroll , or move the Cursor If Needed
+  if (replay) {
+      write_serial(ch);
+  }
   scroll();
   terminal_printCursor(cursor_x,cursor_y);
 }

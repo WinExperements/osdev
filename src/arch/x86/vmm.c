@@ -43,10 +43,15 @@ void vmm_init() {
    #endif
    interrupts_addHandler(14,vmm_pfault);
    current_dir = kdirectory;
+#ifdef DEBUG
+   write_serialString("vmm_x86: initialized\r\n");
+#endif
  }
 void vmm_pfault(registers_t *regs) {
 	uint32_t addr = 0;
+    uint32_t cr3 = 0;
   asm volatile("mov %%cr2, %0" : "=r"(addr));
+  asm volatile("mov %%cr3, %0" : "=r"(cr3));
   bool present = regs->error_code & 0x1;
   bool rw = regs->error_code & 0x2;
   bool us = regs->error_code & 0x4;
@@ -54,6 +59,7 @@ void vmm_pfault(registers_t *regs) {
   bool fetch = regs->error_code & 0x10;
   printf("Page fault at %x, detailed info\n",addr);
   printf("Present: %d\nRW: %d\nUser: %d\nReserved: %d\nFetch: %d\n",present,rw,us,reserved,fetch);
+  printf("Current directory address: %x\nRegistered address: %x\n",cr3,current_dir);
   while(1) {}
 }
 void vmm_enable() {
@@ -87,6 +93,9 @@ void vmm_dump(int *tabble) {
 }
 void vmm_switch(int *dir) {
   if (dir == NULL) return;
+  if (current_dir == dir) {
+      return;
+  }
   current_dir = dir;
   vmm_load();
 }

@@ -1,3 +1,5 @@
 This file contains bugs and errors found while developing the kernel, now start listing the problems.
-1. pmml_allocPages and pmml_alloc returns diffirent addresses.
-2. My rootfs seems broken.
+1. 3GB not mapped or something else, addresses that bigger that 0x163000 are unmapped
+2. Because we have problem with index 1, OS cannot start more that 2 processes from userspace parent.
+3. __process_destroy not destroys allocated page direcotry, i must implemet function named as "vmm_destroyDirectory"
+4. PMM alocates memory that used by the VMM and overides it as result computer forgots about program addresses, and we have #PF

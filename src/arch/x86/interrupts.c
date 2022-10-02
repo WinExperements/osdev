@@ -92,12 +92,10 @@ void idt_set_gate(uint8_t num,uint32_t base,uint16_t sel,uint8_t flags) {
   idt_entries[num].flags   = flags | 0x60;
 }
 void isr_handler(registers_t *regs) {
-  write_serialString("Got exception: ");
-  write_serialInt(regs->int_no);
-  write_serialString("\r\n");
-  /*if (regs->int_no == 14) {
-    write_serialString("Page fault\n");
-    while(1) {}
+  /*if (process_getCurrentPID() != 0) {
+    printf("Exception %d. Killing %d\n",regs->int_no,process_getCurrentPID());
+    arch_enableInterrupts();
+    process_kill(process_getCurrentPID());
   }*/
   if (interrupt_handlers[regs->int_no] != 0) {
     isr_t handler = interrupt_handlers[regs->int_no];

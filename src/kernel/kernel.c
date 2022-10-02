@@ -3,7 +3,6 @@
 architecture initalization, then load and execute buid-in modules in the 
 kernel, after that try to read and execute the init program from the
 CDROM or other boot media */
-/* Keyboard internal test */
 #include<terminal.h>
 #include<serial.h>
 #include<arch.h>
@@ -30,8 +29,20 @@ extern char kernel_start[];
 bool verbose;
 typedef void entry_t();
 void log_status(char *component,bool status);
+bool disableStartInit;
+multiboot_info_t *_multiboot;
+void parse_commandLine(char *commandline) {
+    char *k = strtok(commandline," ");
+    while(k != NULL) {
+        if (strcmp(k,"-noinit")) {
+            disableStartInit = true;
+        }
+        k = strtok(NULL," ");
+    }
+}
 extern void kernel_main(struct multiboot_info *multiboot) {
 	printf("Helin OS kernel 0.0.8 - Initrd and VFS\n");
+    _multiboot = multiboot; 
 	if (!(multiboot->flags >> 6 & 0x1))
 	{
 		PANIC("No memory map");
@@ -51,10 +62,16 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 	log_status("PMM",true);
 	vmm_init();
 	log_status("VMM init",true);
+	vfs_init();
+	log_status("VFS",true);
+	rootfs_init();
+	rootfs_mount("/");
+	vfs_creat(vfs_getRoot(),"dev",VFS_DIRECTORY);
+	vfs_creat(vfs_getRoot(),"bin",VFS_DIRECTORY);
+	log_status("rootfs",true);
 	arch_disableIRQ();
 	process_init();
 	log_status("Process Manager",true);
-	//clist_test();
 	arch_enableIRQ();
 	vmm_load();
 	vmm_enable();
@@ -63,32 +80,70 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 	log_status("Keyboard",true);
 	atapi_init();
 	log_status("ATAPI",true);
-	vfs_init();
-	log_status("VFS",true);
-	rootfs_init();
-	rootfs_mount("/");
-	vfs_creat(vfs_getRoot(),"dev",VFS_DIRECTORY);
-	vfs_creat(vfs_getRoot(),"bin",VFS_DIRECTORY);
-	log_status("rootfs",true);
 	dev_init();
 	log_status("Device manager",true);
 	tty_init();
 	log_status("TTY",true);
 	kshell_init(multiboot);
 	char *cmdline = (char *)multiboot->cmdline;
-	if (strcmp(cmdline,"-v")) {
-		verbose = true;
-	}
-	if (strcmp(cmdline,"-nokshell")) {
-		multiboot_module_t *mod = (multiboot_module_t *)multiboot->mods_addr;
-		elf_load_file((void *)mod->mod_start,true,"init");
-	} else {
-		process_create((int)kshell_main,false,"kshell");
-		/*process_create((int)kshell_main,false,"kshefll");*/
-	}
+	parse_commandLine(cmdline);
+	printf("Copying modules to /bin folder(if present)\n");
+    vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"bin");
+    if (!dev) {
+        printf("no /bin found, execution terminated\n");
+        return;
+    } else if ((dev->flags & 0x7) != VFS_DIRECTORY) {
+        printf("/bin not a directory, execution terminated\n");
+		return;
+    }
+    for (int i = 0; i < multiboot->mods_count; i++) {
+        multiboot_module_t *mod = (multiboot_module_t *)multiboot->mods_addr+i;
+        if (mod->cmdline != 0) {
+            vfs_node_t *in = vfs_creat(dev,(char *)mod->cmdline,0);
+            vfs_write(in,0,mod->mod_end-mod->mod_start,(void *)mod->mod_start);
+        }
+    }
+    if (!disableStartInit) {
+        printf("Trying to execute /bin/init\n");
+        if (!exec_init()) {
+            printf("Failed, entering kshell\n");
+            process_create((int)kshell_main,false,"kshell");
+        }
+    } else {
+        process_create((int)kshell_main,false,"kshell");
+    }
 	arch_enableInterrupts();
 	arch_switchToUser();
 }
 void log_status(char *component,bool status) {
 	printf("[%s] %s\n",(status ? "OK" : "FAIL"),component);
+}
+bool exec_init() {
+	if (_multiboot->mods_count > 0) {
+		vfs_node_t *n = vfs_find("/bin/init");
+		if (!n) {
+			printf("/bin/init file not found\n");
+			return false;
+		}
+		int pages = (n->size/4096)+1;
+		void *start = pmml_allocPages(pages,true);
+		vfs_read(n,0,n->size,start);
+		char **argv = pmml_alloc(true);
+		argv[0] = "/bin/init";
+		argv[1] = "init";
+        char **envp = pmml_alloc(true);
+        envp[0] = "PATH=/bin";
+		if (elf_load_file(start,true,"init",1,argv,envp)) {
+            // okay it must 1
+            struct process *init = process_getProcess(process_getProcesses()-1);
+            init->parent = 0;
+            init->pid = 1;
+			pmml_freePages(start,pages-1);
+			return true;
+		} else {
+			pmml_free(argv);
+			pmml_freePages(start,pages-1);
+		}
+	}
+	return false;
 }

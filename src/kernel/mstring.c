@@ -29,11 +29,13 @@ bool strcmp(char *s1,char *s2) {
 		return false;
 	}
 }
-bool strcpy(char *to,char *from) {
-	int i = strlen(from);
-	for (int u = 0; u < i; u++) {
-		to[u] = from[u];
-	}
+bool strcpy(char *dest,const char *src) {
+	 do
+    {
+      *dest++ = *src++;
+    }
+    while (*src != 0);
+    *dest = '\0';
 	return true;
 }
 const char *strchr(const char *s, char ch)
@@ -81,4 +83,20 @@ char *strdup(char *src) {
 	if (!p) return NULL;
 	memcpy(p,src,len);
 	return p;
+}
+/*
+ * Update 27/9/21
+ * Add atoi support
+*/
+bool isdigit(char c) {
+    return c >= '0' && c <= '9';
+}
+int atoi(char *number) {
+    int value = 0;
+    while(isdigit(*number)) {
+        value *=10;
+        value +=(*number)-'0';
+        number++;
+    }
+    return value;
 }

@@ -8,9 +8,12 @@
 #include<mm/pmm.h>
 #include<elf.h>
 #include<io.h>
+#include<lib/clist.h>
 void parseCommand(int argc,char *cmd[]);
 multiboot_info_t *info;
 vfs_node_t *kshell_tty;
+int pid;
+char path[128];
 int syscall(int num,int p1,int p2,int p3,int p4,int p5) {
     // use asm macro for it
     int ret = 0;
@@ -45,30 +48,17 @@ void getInput(char *buff,int how) {
     syscall(9,(int)kshell_tty,0,100,(int)buff,0);
 }
 void kshell_main() {
-    // prepare some modules
-    printf("Modules: %d\n",info->mods_count);
-    vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"dev");
-    if (!dev) {
-        printf("kshell: no /dev found, execution terminated\n");
-        return;
-    } else if ((dev->flags & 0x7) != VFS_DIRECTORY) {
-        printf("kshell: /dev not a directory, execution terminated\n");
-    }
-    for (int i = 0; i < info->mods_count; i++) {
-        multiboot_module_t *mod = (multiboot_module_t *)info->mods_addr+i;
-        if (mod->cmdline != 0) {
-            vfs_node_t *in = vfs_creat(dev,(char *)mod->cmdline,0);
-            vfs_write(in,0,mod->mod_end-mod->mod_start,(void *)mod->mod_start);
-        }
-    }
     printf("Kernel debugger shell\n");
     bool exit = false;
     char buff[100];
     char *argv[100];
+    char *name = process_getProcess(process_getCurrentPID())->name;
     while(!exit) {
         int argc = 0;
-        printf("> ");
+        vfs_node_path(process_getProcess(process_getCurrentPID())->workDir,path,128);
+        printf("%s > ",name);
         getInput(buff,100);
+        if (buff[0] == '1') continue;
         argv[argc] = strtok(buff," ");
         while(argv[argc]) {
             argc++;
@@ -84,7 +74,7 @@ void parseCommand(int argc,char *cmd[]) {
         if (!vfs_getRoot()) {
             printf("ls: no mount point to /\n");
         } else {
-            vfs_node_t *in = vfs_getRoot();
+            vfs_node_t *in = vfs_find(path);
             if (argc > 1) {
                 in = vfs_finddir(in,cmd[1]);
                 if (!in){
@@ -94,7 +84,7 @@ void parseCommand(int argc,char *cmd[]) {
             struct dirent *d;
             int i = 0;
             while((d = vfs_readdir(in,i)) != 0) {
-                printf("%s\n",d->name);
+                printf("%d, %s\n",i,d->name);
                 i++;
             }
         }
@@ -115,7 +105,7 @@ void parseCommand(int argc,char *cmd[]) {
             if (!vfs_getRoot()) {
                 printf("cat: no mount point to /\n");
             } else {
-                vfs_node_t *n = vfs_finddir(vfs_getRoot(),cmd[1]);
+                vfs_node_t *n = vfs_find(cmd[1]);
                 if (!n) {
                     printf("cat: %s: no such file or directory\n",cmd[1]);
                 } else if ((n->flags & 0x7) == VFS_DIRECTORY) {
@@ -138,28 +128,12 @@ void parseCommand(int argc,char *cmd[]) {
             if (!vfs_getRoot()) {
                 printf("exec: no mount point to /\n");
             } else {
-                vfs_node_t *n = vfs_finddir(vfs_getRoot(),cmd[1]);
-                if (!n) {
-                    printf("exec: %s: no such file or directory\n",cmd[1]);
-                } else if ((n->flags & 0x7) == VFS_DIRECTORY) {
-                    printf("exec: %s: is a directory\n",cmd[1]);
-                } else {
-                    if (n->size != 0) {
-                        int pages = (n->size/4096)+1;
-                        void *buf = pmml_allocPages(pages,true);
-                        vfs_read(n,0,n->size,buf);
-                        syscall(13,(int)buf,(int)n->name,0,0,0);
-                        //process_waitPid(-1);
-                        pmml_freePages(buf,pages);
-                    } else {
-                        printf("exec: file zero\n");
-                    }
+                int ret = syscall(13,(int)cmd[1],0,0,0,0);
+                if (ret > 0) {
+                    syscall(22,process_getCurrentPID(),0,0,0,0);
                 }
             }
         }
-    } else if (strcmp(cmd[0],"execm")){
-        multiboot_module_t *mod = (multiboot_module_t *)info->mods_addr;
-        syscall(13,mod->mod_start,mod->cmdline,0,0,0);
     } else if (strcmp(cmd[0],"reboot")) {
         syscall(14,0,0,0,0,0);
     } else if (strcmp(cmd[0],"cd")) {
@@ -171,7 +145,7 @@ void parseCommand(int argc,char *cmd[]) {
                     printf("cd: no ..\n");
                     return;
                 }
-                vfs_changeDir(prev);
+                syscall(17,(int)prev->name,0,0,0,0);
                 return;
             }
             vfs_node_t *to = vfs_finddir(vfs_getRoot(),cmd[1]);
@@ -183,8 +157,8 @@ void parseCommand(int argc,char *cmd[]) {
                 printf("cd: %s: not a directory\n",cmd[1]);
             }
             // save previest node if we need to switch to ..
-            prev = vfs_getRoot();
-            vfs_changeDir(to);
+            prev = (vfs_node_t *)syscall(16,0,0,0,0,0);
+            syscall(17,(int)to->name,0,0,0,0);
         } else {
             printf("%s\n",vfs_getRoot()->name);
         }
@@ -194,7 +168,7 @@ void parseCommand(int argc,char *cmd[]) {
         }
     } else if (strcmp(cmd[0],"wr")) {
         if (argc > 1) {
-            vfs_node_t *in = vfs_finddir(vfs_getRoot(),cmd[1]);
+            vfs_node_t *in = vfs_find(cmd[1]);
             if (!in) {
                 in = vfs_creat(vfs_getRoot(),cmd[1],0);
             }
@@ -223,7 +197,41 @@ void parseCommand(int argc,char *cmd[]) {
             }
             printf("File name: %s, type: %d, size: %d\n",file->name,file->flags,file->size);
         }
-    } else {
+    } else if (strcmp(cmd[0],"waitpid")) {
+        if (argc > 1) {
+            // DEBUG: watpid test
+            int pid = atoi(cmd[1]);
+            process_waitPid(pid);
+        } else {
+            printf("waitpid [pid]\n");
+        }
+#ifdef DEBUG
+    } else if (strcmp(cmd[0],"lockidle")) {
+        // DEBUG: lock IDLE task
+        process_waitPid(0);
+        printf("debug: successfull!\n");
+    } else if (strcmp(cmd[0],"unlockidle")) {
+        process_unblock(0);
+    } else if (strcmp(cmd[0],"dump")) {
+        if (argc == 0) {
+            process_dump(process_getProcess(process_getCurrentPID()));
+        } else {
+            int pid = atoi(cmd[1]);
+            process_dump(process_getProcess(pid));
+        }
+    } else if (strcmp(cmd[0],"rme")) {
+        syscall(21,0,0,0,0,0);
+#endif
+    } else if (strcmp(cmd[0],"ps")) {
+        process_dumpAll();
+    } else if (strcmp(cmd[0],"kill")) {
+        if (argc > 1) {
+            // kill
+            process_kill(atoi(cmd[1]));
+        }
+    } else if (strcmp(cmd[0],"pid")) {
+        printf("%d\n",process_getCurrentPID());
+    }  else {
         printf("Unknown command: \"%s\"\n",cmd[0]);
     }
 }

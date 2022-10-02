@@ -48,11 +48,10 @@ struct dirent *rootfs_readdir(vfs_node_t *in,uint32_t index) {
             memset(&rootfs_dirent,0,sizeof(rootfs_dirent));
             rootfs_dirent.node = n->inode;
             strcpy(rootfs_dirent.name,n->name);
-            rootfs_dirent.name[strlen(n->name)] = 0;
             return &rootfs_dirent;
         }
         n = n->next_child;
-        i++;
+        ++i;
     }
     return NULL;
 }
@@ -106,13 +105,6 @@ void rootfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
     node->size = how;
 }
 void rootfs_truncate(vfs_node_t *node,int size) {
-    vfs_node_t *n = root->first_child;
-    while(n != NULL) {
-        if (strcmp(n->name,node->name)) {
-            n->size = size;
-            return;
-        }
-        n = n->next_child;
-    }
+    node->size = size;
 }
 void rootfs_close(vfs_node_t *node) {}

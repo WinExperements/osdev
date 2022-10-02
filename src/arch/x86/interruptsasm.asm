@@ -152,6 +152,9 @@ irq_common_stub:
     push esp
     call irq_handler
     mov esp,eax
+    jmp irq_handler_exit ; Exit from this code using jmp
+[GLOBAL irq_handler_exit]
+irq_handler_exit:
     pop ebx
     mov ds, ebx
     mov es, ebx
@@ -182,37 +185,8 @@ syscall_irq:
 [GLOBAL scheduler_irq]
 extern process_schedule
 extern runningTask
-extern panic
+extern write_serialString
 scheduler_irq:
-	pusha
-  push ds
-  push es
-  push fs
-  push gs
-	mov ax,0x10
-	mov ds,ax
-	mov es,ax
-	mov fs,ax
-	mov gs,ax
-  push esp
-	call process_schedule
-  cmp eax,0
-  jz _scheduler_error
-  mov esp,eax
-  pop gs
-  pop fs
-  pop es
-  pop ds
-	_scheduler_exit:
-  popa
-	iret
-  _scheduler_error:
-  push _schedulerError
-  push _schedulerName
-  push _schedulerFile
-  call panic
-
-section .data
-_schedulerError db "Returned stack null",0
-_schedulerName db "scheduler_irq",0
-_schedulerFile db "interruptsasm.asm",0
+  push 0
+  push 32
+  jmp irq_common_stub

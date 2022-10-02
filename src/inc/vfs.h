@@ -46,10 +46,10 @@ void vfs_mount(vfs_node_t *root,char *mountPoint);
 vfs_node_t *vfs_creat(vfs_node_t *in,char *name,int flags);
 void rootfs_init();
 void rootfs_mount(char *to);
-void vfs_changeDir(vfs_node_t *to);
 vfs_node_t *vfs_find(char *path);
 void vfs_truncate(vfs_node_t *node,int size);
 void vfs_readBlock(vfs_node_t *node,int blockN,int how,void *buff);
 void vfs_writeBlock(vfs_node_t *node,int blockN,int how,void *buff);
 void vfs_ioctl(vfs_node_t *node,int request,void *argp);
+void vfs_node_path(vfs_node_t *node,char *path,int size);
 #endif

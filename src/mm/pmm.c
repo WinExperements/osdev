@@ -5,6 +5,7 @@
 #include<serial.h>
 #include<arch.h>
 #include<terminal.h>
+#include "mm/vmm.h"
 uint32_t main_memory_size;
 uint16_t *bitmap;
 uint32_t max_blocks,free_blocks,used_blocks;
@@ -38,7 +39,7 @@ int pmml_firstFree_size(uint32_t size) {
 		return pmml_firstFree();
 	}
 	uint32_t frame = 0;
-	for (int i = 0; i < max_blocks; i++) {
+	for (int i = 0; i < max_blocks; ++i) {
 		if (!mmap_test(i)) {
 			frame++;
 		}
@@ -66,7 +67,14 @@ void ppml_init(struct multiboot_info *info,uint32_t _endkernel,uint32_t kernel_s
 	for (int i = 0; i < max_blocks; i++) {
 		mmap_set(i,true);
 	}
-	pmml_initRegion(_endkernel+bitmapSize,size);
+	pmml_initRegion((_endkernel+bitmapSize)+0x1000,size);
+#ifdef DEBUG
+    write_serialString("pmm: initialized ");
+    write_serialHex(_endkernel+bitmapSize);
+    write_serialString(" to ");
+    write_serialHex((_endkernel+bitmapSize)+size);
+    write_serialString("\r\n");
+#endif
 }
 void *pmml_alloc(bool clear) {
 	if (pmml_getFreeBlocks() <= 0) {
@@ -83,6 +91,8 @@ void *pmml_alloc(bool clear) {
 	if (clear) {
 		memset((void *)addr,0,4096);
 	}
+	used_blocks++;
+   // vmm_mapPhysical(vmm_getCurrentDirectory(),(int)addr,(int)addr);
 	return (void *)addr;
 }
 int pmml_free(void *addr)
@@ -90,7 +100,7 @@ int pmml_free(void *addr)
 	uint32_t add = (uint32_t)addr;
 	int frame = add / 4096;
 	mmap_set(frame,false);
-	used_blocks++;
+	used_blocks--;
 	return true;
 }
 int pmml_getMemorySize() {
@@ -107,7 +117,20 @@ void *pmml_allocPages(int count,bool clear) {
 			return NULL;
 		}
 		for (int i = 0; i < count; i++) {
-			mmap_set(frame+i,true);
+            //int addr = (frame+i)*4096;
+            if (!mmap_test(frame+i)) {
+                mmap_set(frame+i,true);
+            } else {
+                /*
+                 * This means that PMM dealocated some of memory
+                 * but some of that are allocated too,
+                 * so find normal unused memory buy recursion,
+                 * while we don't return out of memory exc
+                 * eption, or valid address
+                 */
+                return pmml_allocPages(count,clear);
+            }
+            // vmm_mapPhysical(vmm_getCurrentDirectory(),addr,addr);
 		}
 		uint32_t addr = frame*4096;
 		used_blocks+=count;

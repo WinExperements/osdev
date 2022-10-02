@@ -3,5 +3,6 @@
 int getpid();
 void exit(int exitcode);
 void *malloc(int size);
-void free(void *p,int pages);
+void free(void *p);
+char *getenv(const char *name);
 #endif

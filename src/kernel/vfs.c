@@ -3,10 +3,16 @@
 #include<terminal.h>
 #include<mstring.h>
 #include<dev.h>
+#include<arch.h>
+#include<serial.h>
 vfs_fs_t *fs_start;
 vfs_node_t *fs_root;
+vfs_node_t *vfs_find_impl(vfs_node_t *start,char *path);
 void vfs_init() {
     printf("VFS: version 1.0\n");
+#ifdef DEBUG
+    write_serialString("vfs: initialized\r\n");
+#endif
 }
 void vfs_addFS(vfs_fs_t *fs) {
     if (!fs_start) {
@@ -94,20 +100,25 @@ vfs_node_t *vfs_creat(vfs_node_t *in,char *name,int flags) {
     }
     return in->creat(in,name,flags);
 }
-void vfs_changeDir(vfs_node_t *to) {
-    if (!to) {
-        printf("cd: invalid directory\n");
-        return;
-    }
-    fs_root = to;
-}
 void vfs_truncate(vfs_node_t *node,int size) {
-    if (!node || !node->truncate) {
+    if (!node || node->truncate != 0) {
         node->truncate(node,size);
     }
 }
 vfs_node_t *vfs_find(char *path) {
-    printf("[vfs]: find %s\n",path);
+    if (path[0] == '/') {
+        return vfs_find_impl(vfs_getRoot(),path);
+    } else {
+        vfs_node_t *workDir = process_getProcess(process_getCurrentPID())->workDir;
+        if (!workDir) {
+            printf("vfs_find: Seems your process are broken, cannot find work dir\n");
+            return NULL; // return
+        }
+        if (strcmp(path,"..")) {
+            return workDir->prev;
+        }
+        return vfs_find_impl(workDir,path);
+    }
     return NULL;
 }
 void vfs_readBlock(vfs_node_t *node,int blockN,int how,void *buff) {
@@ -121,4 +132,47 @@ void vfs_writeBlock(vfs_node_t *node,int blockN,int how,void *buff) {
 void vfs_ioctl(vfs_node_t *node,int request,void *argp) {
     if (!node || !node->ioctl) return;
     node->ioctl(node,request,argp);
+}
+vfs_node_t *vfs_find_impl(vfs_node_t *start,char *path) {
+    char *t = strtok(path,"/");
+    vfs_node_t *node = start;
+    while(t) {
+        node = vfs_finddir(node,t);
+        if (!node) return NULL;
+        t = strtok(NULL,"/");
+    }
+    return node;
+}
+void vfs_node_path(vfs_node_t *node,char *path,int size) {
+    if (node == fs_root) {
+        if (size > 1) {
+            path[0] = '/';
+            path[1] = '\0';
+            return;
+        } else {
+            return;
+        }
+    } else {
+        char target_path[128];
+        vfs_node_t *n = node;
+        int char_index = 127;
+        while (n != NULL) {
+            int len = strlen(n->name);
+            char_index-=len;
+            if (char_index < 2) {
+                return;
+            }
+            if (n->prev != NULL) {
+                strcpy(target_path+char_index,n->name);
+                char_index-=1;
+                target_path[char_index] = '/';
+            }
+            n = n->prev;
+        }
+        int len = 127-char_index;
+        if (size < len) {
+            return;
+        }
+        strcpy(path,target_path+char_index+1);
+    }
 }

@@ -17,5 +17,13 @@ int sys_free(int p1,int p2,int p3,int p4,int p5);
 int sys_exec(int p1,int p2,int p3,int p4,int p5);
 int sys_reboot(int p1,int p2,int p3,int p4,int p5);
 int sys_poweroff(int p1,int p2,int p3,int p4,int p5);
+int sys_pwd(int p1,int p2,int p3,int p4,int p5);
+int sys_chdir(int p1,int p2,int p3,int p4,int p5);
+int sys_opendir(int p1,int p2,int p3,int p4,int p5);
+int sys_closedir(int p1,int p2,int p3,int p4,int p5);
+int sys_readdir(int p1,int p2,int p3,int p4,int p5);
+int sys_exec_shell(int p1,int p2,int p3,int p4,int p5);
+int sys_waitpid(int p1,int p2,int p3,int p4,int p5);
+int sys_getppid(int p1,int p2,int p3,int p4,int p5);
 registers_t *syscall_handler(registers_t *regs);
 #endif

@@ -17,7 +17,7 @@ int msg_send(int pid,int type,void *message) {
     msg.message = (void *)message;
     msg.len = strlen(message);
     p->messages[p->message_count++] = msg;
-    process_update(pid,p);
+    //process_update(pid,p);
     return 0;
 }
 msg_t msg_receive(int pid) {
@@ -28,6 +28,6 @@ msg_t msg_receive(int pid) {
     }
     msg_t msg = p->messages[p->message_count-1];
     p->message_count--;
-    process_update(pid,p);
+    //process_update(pid,p);
     return msg;
 }

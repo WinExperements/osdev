@@ -16,4 +16,16 @@ void arch_disableInterrupts();
 void arch_enableInterrupts();
 void kassert(const char *file,const char *func,int line,bool exc);
 #define assert(b) kassert(__FILE__,__func__,__LINE__,b)
+// Copy arguments to process stack, architecture dependies
+void arch_copy_process_args(struct process *p,int argc,char **argv,char **envp);
+/* Destroy our stack, warrning: we are passing process ESP field as stack
+@param stack Our stack to destroy
+*/
+void arch_destroyStack(void *stack);
+/*
+    Switch betwen task A and B
+    @param stack Stack change to we need
+*/
+void arch_switchContext(void *stack);
+void arch_saveRegs(void *from,void *to);
 #endif

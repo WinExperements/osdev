@@ -1,11 +1,10 @@
 default: all
-OBJECTS = stdio.o stdlib.o start.o message.o syscall.o
+OBJECTS = stdio.o stdlib.o start.o message.o syscall.o string.o unistd.o dirent.o wait.o
 %.o: %.c
-	i686-elf-gcc -m32 -nostartfiles -nodefaultlibs -c -o $@ $<
+	gcc -g -m32 -nostartfiles -nodefaultlibs -Wno-builtin-declaration-mismatch -c -o $@ $<
 %.o: %.asm
-	nasm -f elf32 $@ $<
+	nasm -f elf32 -o $@ $<
 all: $(OBJECTS)
 	ar rcs libcc.a $(OBJECTS)
-	ld -melf_i386 -fpic -shared $(OBJECTS) -o g.so
 clean:
-	del *.o
+	rm *.o

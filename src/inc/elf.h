@@ -140,7 +140,7 @@ typedef struct {
 */
 bool elf_check_file(Elf32_Ehdr *hdr);
 /* Loads ELF file */
-bool elf_load_file(void *fileAddress,bool isUser,char *name);
+bool elf_load_file(void *fileAddress,bool isUser,char *name,int argc,char **argv,char **envp);
 static inline Elf32_Shdr *elf_sheader(Elf32_Ehdr *hdr) {
 	return (Elf32_Shdr *)((int)hdr + hdr->e_shoff);
 }

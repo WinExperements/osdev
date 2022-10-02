@@ -2,28 +2,12 @@
 #define PROCESS_H
 #include<typedefs.h>
 #include<mm/vmm.h>
-#include <arch.h>
 #include<ipc/message.h>
-#define STATE_READY 2
-struct _stackFrame {
-  uint32_t gs;
-  uint32_t fs;
-  uint32_t es;
-  uint32_t ds;
-  uint32_t eax;
-  uint32_t ebx;
-  uint32_t ecx;
-  uint32_t edx;
-  uint32_t esi;
-  uint32_t edi;
-  uint32_t esp;
-  uint32_t ebp;
-  uint32_t eip;
-  uint32_t cs;
-  uint32_t flags;
-  uint32_t usersp;
-  uint32_t ss;
-};
+#include<vfs.h>
+#include<lib/clist.h>
+#define PROCESS_KILLING 1
+#define PROCESS_WAITPID 2 // process waiting for childs
+#define PROCESS_QUOTA 10
 typedef struct _stackFrame stackFrame;
 struct process {
 	void *esp;
@@ -41,28 +25,91 @@ struct process {
   int parent;
   struct process *child;
   int lAddr;
+  vfs_node_t *workDir;
+  int page_start;
+  int quota;
+  bool user;
 };
 extern struct process *runningTask;
+/* 
+ Initialize the process manager(scheduler)
+ */
 void process_init();
-struct process *process_create(int,bool isUser,char *name);
+/*
+ * Creates new task
+ @param entry Entry point
+ @param isUser - Is task must runned in user mode
+ @param name Task name
+*/
+struct process *process_create(int entry,bool isUser,char *name);
+/*
+ * Delete the task from process list
+*/
 void process_delete(struct process *);
+/*
+ * Kill task by it's own PID
+*/
 void process_kill(int);
+/*
+ * Dump process
+*/
 void process_dump(struct process *);
 /* process_schedule - Process scheduler function
 stack - Current Stack
 Return Value:
 Next task stack
  */
-void *process_schedule(void *stack);
+void process_schedule(registers_t *stack);
+/*
+ * Return current process ID
+*/
 int process_getCurrentPID();
+/*
+ * Exit from currently process, by id and return code
+ * called by process_kill
+ * TODO: Re-write it and remove calling exit for kill
+*/
 void process_exit(int pid,int returnCode);
-void process_switchIdle();
+/*
+ * Return process structure by PID
+*/
 struct process *process_getProcess(int pid);
-void process_update(int pid,struct process *to);
+/*
+ * Block process from execution
+*/
 void process_block(int pid);
+/*
+ * Unblock process and re-schedule
+*/
 void process_unblock(int pid);
+/* 
+ * Process sleep and wait function implemented here
+*/
 void process_wait(int pid,int ms);
 /* Wait for any child process if the pid are -1 */
 void process_waitPid(int pid);
+/*
+ * Re-schedule
+*/
 void process_yield();
+/*
+ * Return total count of processes
+*/
+int process_getProcesses();
+/*
+ * Get our task list
+*/
+void process_dumpAll();
+/*
+ * Disable scheduler
+*/
+void process_disableScheduler();
+/*
+ * Enable scheduler
+*/
+void process_enableScheduler();
+/*
+ * Return current PID index, mostly used for exec syscall
+*/
+int process_getNextPID();
 #endif

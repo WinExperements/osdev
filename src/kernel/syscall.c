@@ -10,6 +10,9 @@
 #include<vfs.h>
 #include<elf.h>
 #include<keyboard.h>
+#include<arch.h>
+#include<serial.h>
+#include<kshell.h>
 static void *syscalls[] = {
 	0,
 	&sys_print,
@@ -26,10 +29,18 @@ static void *syscalls[] = {
 	&sys_free,
 	&sys_exec,
 	&sys_reboot,
-	&sys_poweroff
+	&sys_poweroff,
+	&sys_pwd,
+	&sys_chdir,
+	&sys_opendir,
+	&sys_closedir,
+	&sys_readdir,
+	&sys_exec_shell,
+    &sys_waitpid,
+    &sys_getppid
 };
 registers_t *syscall_handler(registers_t *regs) {
-	if (regs->eax > 15) {
+	if (regs->eax > 23) {
 		printf("No such syscall number: %d\n",regs->eax);
 		process_kill(process_getCurrentPID());
 		process_yield();
@@ -41,7 +52,12 @@ registers_t *syscall_handler(registers_t *regs) {
 	return regs;
 }
 int sys_print(int p1,int p2,int p3,int p4,int p5) {
-	printf((char *)p1);
+	char *msg = (char *)p1;
+	if (strcmp(msg,"\033[2J")) {
+		terminal_clear();
+	} else {
+		printf(msg);
+	}
 	return 0;
 }
 int sys_exit(int p1,int p2,int p3,int p4,int p5) {
@@ -72,7 +88,7 @@ int sys_recev(int p1,int p2,int p3,int p4,int p5) {
 }
 int sys_open(int p1,int p2,int p3,int p4,int p5) {
 	int flags = p2;
-	vfs_node_t *node = vfs_finddir(vfs_getRoot(),(char *)p1);
+	vfs_node_t *node = vfs_find((char *)p1);
 	if (!node && flags == 7) {
 		node = vfs_creat(vfs_getRoot(),(char *)p1,0);
 	}
@@ -94,26 +110,98 @@ int sys_alloc(int p1,int p2,int p3,int p4,int p5) {
 	return (int)pmml_allocPages(p1,true);
 }
 int sys_free(int p1,int p2,int p3,int p4,int p5) {
+	if (p1 == 0) {
+		printf("Freeing address 0 doesn't allowed!\n");
+		process_kill(process_getCurrentPID());
+	}
 	pmml_freePages((int *)p1,p2);
 	return 0;
 }
 int sys_exec(int p1,int p2,int p3,int p4,int p5) {
-	if(elf_load_file((int *)p1,true,(char *)p2)) {
-		process_waitPid(1);
+    process_disableScheduler();
+	char *path = (char *)p1;
+	vfs_node_t *node = vfs_find(path);
+	if (!node) return -1;
+	if ((node->flags & 0x7) == VFS_DIRECTORY) {
+		printf("%s: directory\n",p1);
+		return -2;
 	}
-	return 0;
+	void *addr = pmml_allocPages((node->size/4096),true);
+	vfs_read(node,0,node->size,addr);
+	if (!elf_load_file(addr,true,node->name,p2,(char **)p3,(char **)p4)) {
+        	printf("exec: loading elf failed!\n");
+            pmml_freePages(addr,(node->size/4096));
+        	arch_enableInterrupts();
+		return -2;
+	}
+	pmml_freePages(addr,(node->size/4096));
+    process_enableScheduler();
+   // process_dump(process_getProcess(process_getProcesses()-1));
+	return process_getNextPID()-1;
 }
 int sys_reboot(int p1,int p2,int p3,int p4,int p5) {
-	printf("SYSTEM GOING REBOOT NOW!\n");
-	printf("Press enter to confirm reboot. Or press \"n\" to cancel: ");
-	if (keyboard_get() == 'n') {
-		printf("\nCancelled\n");
-		return 0;
-	}
 	arch_reset();
 	return 0; // should not happen
 }
 int sys_poweroff(int p1,int p2,int p3,int p4,int p5) {
 	arch_poweroff();
 	return 0;
+}
+// Change working directory for current process(caller)
+int sys_chdir(int to,int p2,int p3,int p4,int p5) {
+	// find the caller
+	struct process *caller = process_getProcess(process_getCurrentPID());
+	if (!caller) {
+		// very strange, should never happen, panic
+		PANIC("Cannot get caller!\n");
+	}
+	vfs_node_t *node = vfs_find((char *)to);
+	if (!node) {
+		printf("chdir: %s: no such file or directory\n",(char *)to);
+		return -1;
+	}
+	caller->workDir = node;
+	return 0;
+}
+int sys_pwd(int p1,int p2,int p3,int p4,int p5) {
+	vfs_node_path(process_getProcess(process_getCurrentPID())->workDir,(char *)p1,p2);
+	return 0;
+}
+int sys_opendir(int p1,int p2,int p3,int p4,int p5) {
+	// Open dir, is a just like sys_open
+	return sys_open((int)p1,0,0,0,0);
+}
+int sys_closedir(int p1,int p2,int p3,int p4,int p5) {
+	// Just like sys_close
+	return 0;
+}
+int sys_readdir(int p1,int p2,int p3,int p4,int p5) {
+	vfs_node_t *node = (vfs_node_t *)p1;
+	if (node) {
+		return (int)vfs_readdir(node,p2);
+	}
+	return 0;
+}
+int sys_exec_shell(int p1,int p2,int p3,int p4,int p5) {
+    return 0;
+}
+int sys_waitpid(int p1,int p2,int p3,int p4,int p5) {
+    if (p1 > 0) {
+        //check if given process has spawned by current caller
+        struct process *child = process_getProcess(p1);
+        int parent = process_getCurrentPID();
+        if (child != NULL && child->parent == parent) {
+            process_waitPid(parent);
+            struct process *p = process_getProcess(parent);
+            while(p->state == PROCESS_WAITPID) {}
+        }
+    }
+    return 0;
+}
+int sys_getppid(int p1,int p2,int p3,int p4,int p5) {
+    struct process *parent = process_getProcess(process_getProcess(process_getCurrentPID())->parent);
+    if (parent != NULL) {
+        return parent->pid;
+    }
+    return 0;
 }
