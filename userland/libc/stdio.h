@@ -6,7 +6,7 @@ typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
 typedef void FILE;
 typedef unsigned int size_t;
-void printf(char *message,...);
+void printf(const char *,...);
 FILE *fopen(char *file,char *mode);
 int fread(void *buff,int size,int count,FILE *file);
 int fclose(FILE *file);

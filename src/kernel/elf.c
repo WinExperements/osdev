@@ -6,6 +6,7 @@
 #include<x86/vmm_x86.h>
 #include<module.h>
 #include<arch.h>
+#include<serial.h>
 bool elf_check_file(Elf32_Ehdr *hdr) {
     if (!hdr) {
         printf("elf: given header are null\n");
@@ -69,7 +70,7 @@ bool elf_load_file(void *file,bool isUser,char *name,int argc,char **argv,char *
             }
             if (dir == 0) {
                 dir = vmm_createDirectory();
-                pages_s+=2;
+                pages_s+=8;
             }
              if (page_start == 0) {
                 page_start = (int)dir;
@@ -82,7 +83,7 @@ bool elf_load_file(void *file,bool isUser,char *name,int argc,char **argv,char *
             if (page_start == 0) {
                 page_start = vaddr;
             }
-            int *table = pmml_alloc(true);
+            int *table = pmml_allocPages(2,true);
             pages_s+=2;
             memcpy(to,section,p_entry->p_memsz);
             for (int i = 0; i < pages; i++) {
@@ -93,24 +94,20 @@ bool elf_load_file(void *file,bool isUser,char *name,int argc,char **argv,char *
             dir[PAGE_DIRECTORY_INDEX(vaddr)] = ((unsigned int)table) | 7;
         }
     }
-    struct process *p = process_create(header->e_entry,isUser,name);
+    if (argc == 0 || argv == 0) {
+       if (isUser) {
+            argv = pmml_alloc(true); // arguments
+            argv[0] = "<unknown>";
+            argv[1] = "init";
+            argc = 1;
+       }
+    }
+    struct process *p = process_create(header->e_entry,isUser,name,argc,argv);
     if (!p) {
         pmml_freePages((void *)page_start,pages_s);
     }
     p->dir = (uint32_t)dir;
     p->pages = pages_s;
     p->page_start = page_start;
-    if (argc == 0 || argv == 0) {
-        char **argva = pmml_alloc(true); // arguments
-        argva[0] = "<unknown>";
-        argva[1] = "init";
-        if (envp == NULL) {
-             envp = pmml_alloc(true);
-            envp[0] = "PATH=/bin";
-        }
-        arch_copy_process_args(p,2,argva,envp);
-    } else {
-        arch_copy_process_args(p,argc,argv,envp);
-    }
     return true;
 }

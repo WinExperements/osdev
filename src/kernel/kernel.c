@@ -24,11 +24,10 @@ CDROM or other boot media */
 #include<symbols.h>
 #include<kshell.h>
 #include<lib/clist.h>
+#include<stddef.h>
 extern char kernel_end[];
 extern char kernel_start[];
 bool verbose;
-typedef void entry_t();
-void log_status(char *component,bool status);
 bool disableStartInit;
 multiboot_info_t *_multiboot;
 void parse_commandLine(char *commandline) {
@@ -41,7 +40,7 @@ void parse_commandLine(char *commandline) {
     }
 }
 extern void kernel_main(struct multiboot_info *multiboot) {
-	printf("Helin OS kernel 0.0.8 - Initrd and VFS\n");
+	printf("Helin OS kernel compiled at %s:%s ",__DATE__,__TIME__);
     _multiboot = multiboot; 
 	if (!(multiboot->flags >> 6 & 0x1))
 	{
@@ -59,35 +58,32 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 		ppml_init(multiboot,(uint32_t)kernel_end,(int)kernel_end-(int)kernel_start);
 		//PANIC("Must be at less one module(initrd) passed.");
 	}
-	log_status("PMM",true);
+	printf("with %d MB memory\n",(pmml_getMaxBlocks()*4096)/1024/1024);
+    printf("Initializing VMM and VFS\n");
 	vmm_init();
-	log_status("VMM init",true);
 	vfs_init();
-	log_status("VFS",true);
 	rootfs_init();
 	rootfs_mount("/");
 	vfs_creat(vfs_getRoot(),"dev",VFS_DIRECTORY);
 	vfs_creat(vfs_getRoot(),"bin",VFS_DIRECTORY);
-	log_status("rootfs",true);
+    printf("Initializing process manager\n");
 	arch_disableIRQ();
 	process_init();
-	log_status("Process Manager",true);
 	arch_enableIRQ();
+    printf("Enabling VMM and Initializing keyboard\n");
 	vmm_load();
 	vmm_enable();
-	log_status("VMM enable",true);
 	keyboard_init();
-	log_status("Keyboard",true);
-	atapi_init();
-	log_status("ATAPI",true);
+	//atapi_init();
+    printf("Initializing devfs and tty's\n");
 	dev_init();
-	log_status("Device manager",true);
 	tty_init();
-	log_status("TTY",true);
+    printf("Initializing kshell\n");
 	kshell_init(multiboot);
+    printf("Parsing command line\n");
 	char *cmdline = (char *)multiboot->cmdline;
 	parse_commandLine(cmdline);
-	printf("Copying modules to /bin folder(if present)\n");
+    printf("Copying modules to ramfs\n");
     vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"bin");
     if (!dev) {
         printf("no /bin found, execution terminated\n");
@@ -103,20 +99,26 @@ extern void kernel_main(struct multiboot_info *multiboot) {
             vfs_write(in,0,mod->mod_end-mod->mod_start,(void *)mod->mod_start);
         }
     }
+    printf("Finishing up\n");
+   /* uint32_t *target = pmml_alloc(true);
+    atapi_read_sector((uint32_t)target,0,1);
+    for (int i = 0; i < 256; i++) {
+        printf("%x ",target[i] & 0xff);
+        printf("%x ",(target[i] >> 8) & 0xff);
+    }*/
+   // pmml_free(target);
     if (!disableStartInit) {
-        printf("Trying to execute /bin/init\n");
+        printf("Starting init\n");
         if (!exec_init()) {
             printf("Failed, entering kshell\n");
-            process_create((int)kshell_main,false,"kshell");
+            process_create((int)kshell_main,false,"kshell",0,NULL);
+        } else {
+            printf("Init created\n");
         }
     } else {
-        process_create((int)kshell_main,false,"kshell");
+        process_create((int)kshell_main,false,"kshell",0,NULL);
     }
-	arch_enableInterrupts();
-	arch_switchToUser();
-}
-void log_status(char *component,bool status) {
-	printf("[%s] %s\n",(status ? "OK" : "FAIL"),component);
+    arch_enableInterrupts();
 }
 bool exec_init() {
 	if (_multiboot->mods_count > 0) {
@@ -131,13 +133,13 @@ bool exec_init() {
 		char **argv = pmml_alloc(true);
 		argv[0] = "/bin/init";
 		argv[1] = "init";
-        char **envp = pmml_alloc(true);
-        envp[0] = "PATH=/bin";
-		if (elf_load_file(start,true,"init",1,argv,envp)) {
-            // okay it must 1
-            struct process *init = process_getProcess(process_getProcesses()-1);
-            init->parent = 0;
-            init->pid = 1;
+       		/* char **envp = pmml_alloc(true);
+        	envp[0] = "PATH=/bin";*/
+		if (elf_load_file(start,true,"init",1,argv,NULL)) {
+            		// okay it must 1
+           		struct process *init = process_getProcess(process_getProcesses()-1);
+           		init->parent = 0;
+           		init->pid = 1;
 			pmml_freePages(start,pages-1);
 			return true;
 		} else {

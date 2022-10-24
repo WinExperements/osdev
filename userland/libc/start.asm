@@ -4,22 +4,10 @@ extern main
 global _start
 extern exit
 extern __env
+extern _stdio_init
+extern _stdio_exit
 _start:
-    ; Clear stack, we currently doesn't have have argument passing
-    ; Clear stack
-    ; Debug
-    pop eax
-    ; Check if argument exists
-    cmp eax,0
-    je .exit
-    push eax
-    pop ebx
-    mov [__env],ebx
-    pop ebx
-    push ebx
-    push eax
-    .run:
     call main
     .exit:
-    push 0
+    push eax
     call exit

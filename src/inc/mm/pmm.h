@@ -13,4 +13,5 @@ void pmml_initRegion(uint32_t address,uint32_t size);
 void pmml_deinit_region(uint32_t address,uint32_t size);
 /* Returns count of free blocks of memory */
 int pmml_getFreeBlocks();
+bool pmml_isPageAllocated(void *page);
 #endif

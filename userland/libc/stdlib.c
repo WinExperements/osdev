@@ -19,6 +19,7 @@ void exit(int exitcode) {
 void *malloc(int size) {
 	if (size > 4096) {
 		printf("malloc: Too large chunk\n");
+        return NULL;
 	}
 	void *ret = (void *)helin_syscall(11,1,0,0,0,0);
 	/*if (first_page_addr == 0) {
@@ -33,8 +34,10 @@ void free(void *address) {
 	helin_syscall(12,(int)address,1,0,0,0);
 }
 char *getenv(const char *name) {
-    int i = 0;
-    char *item = __env[i];
+    /*int i = 0;
+    char *item = malloc(strlen(__env[0]));
+    if (!item) return NULL;
+    strcpy(item,__env[0]);
     while(item != NULL) {
         char *token = strtok(item,"=");
         if (token != NULL) {
@@ -43,6 +46,6 @@ char *getenv(const char *name) {
             }
         }
         item = __env[++i];
-    }
+    }*/
     return NULL;
 }

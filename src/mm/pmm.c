@@ -86,12 +86,20 @@ void *pmml_alloc(bool clear) {
 		printf("%s: Cannot found first free block, %x\n",__func__,frame);
 		return NULL;
 	}
-	mmap_set(frame,true);
+	if (!mmap_test(frame)) {
+        mmap_set(frame,true);
+    } else {
+        printf("mm: eh, the same problem\n");
+        PANIC("BR");
+    }
 	uint32_t addr = frame * 4096;
 	if (clear) {
 		memset((void *)addr,0,4096);
 	}
 	used_blocks++;
+    /*write_serialString("alloc ");
+    write_serialHex(addr);
+    write_serialString("\r\n");*/
    // vmm_mapPhysical(vmm_getCurrentDirectory(),(int)addr,(int)addr);
 	return (void *)addr;
 }
@@ -101,6 +109,9 @@ int pmml_free(void *addr)
 	int frame = add / 4096;
 	mmap_set(frame,false);
 	used_blocks--;
+      write_serialString("free ");
+    write_serialHex(add);
+    write_serialString("\r\n");
 	return true;
 }
 int pmml_getMemorySize() {
@@ -111,26 +122,26 @@ int pmml_getMaxBlocks() {
 }
 void *pmml_allocPages(int count,bool clear) {
 	if (pmml_getFreeBlocks() >= count) {
+        if (count == 1) {
+            return pmml_alloc(clear);
+        }
 		int frame = pmml_firstFree_size(count);
 		if (frame == -1) {
 			printf("%s: Cannot find any free blocks\n",__func__);
 			return NULL;
 		}
 		for (int i = 0; i < count; i++) {
-            //int addr = (frame+i)*4096;
-            if (!mmap_test(frame+i)) {
-                mmap_set(frame+i,true);
-            } else {
+            if (mmap_test(frame+i)) {
                 /*
                  * This means that PMM dealocated some of memory
                  * but some of that are allocated too,
-                 * so find normal unused memory buy recursion,
+                 * so find normal unused memory by recursion,
                  * while we don't return out of memory exc
                  * eption, or valid address
                  */
                 return pmml_allocPages(count,clear);
             }
-            // vmm_mapPhysical(vmm_getCurrentDirectory(),addr,addr);
+            mmap_set(frame+i,true);
 		}
 		uint32_t addr = frame*4096;
 		used_blocks+=count;
@@ -162,4 +173,9 @@ void pmml_initRegion(uint32_t address,uint32_t size) {
 }
 int pmml_getFreeBlocks() {
 	return max_blocks-used_blocks;
+}
+bool pmml_isPageAllocated(void *page) {
+    int a = (int)page;
+    int frame = a/4096;
+    return mmap_test(frame);
 }

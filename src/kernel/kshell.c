@@ -14,6 +14,7 @@ multiboot_info_t *info;
 vfs_node_t *kshell_tty;
 int pid;
 char path[128];
+bool exit;
 int syscall(int num,int p1,int p2,int p3,int p4,int p5) {
     // use asm macro for it
     int ret = 0;
@@ -49,7 +50,7 @@ void getInput(char *buff,int how) {
 }
 void kshell_main() {
     printf("Kernel debugger shell\n");
-    bool exit = false;
+    exit = false;
     char buff[100];
     char *argv[100];
     char *name = process_getProcess(process_getCurrentPID())->name;
@@ -100,6 +101,7 @@ void parseCommand(int argc,char *cmd[]) {
         terminal_clear();
     } else if (strcmp(cmd[0],"exit")) {
         syscall(2,0,0,0,0,0);
+        //exit = true;
     } else if (strcmp(cmd[0],"cat")) {
         if (argc > 1) {
             if (!vfs_getRoot()) {
@@ -130,7 +132,7 @@ void parseCommand(int argc,char *cmd[]) {
             } else {
                 int ret = syscall(13,(int)cmd[1],0,0,0,0);
                 if (ret > 0) {
-                    syscall(22,process_getCurrentPID(),0,0,0,0);
+                    syscall(22,ret,0,0,0,0);
                 }
             }
         }
@@ -186,8 +188,9 @@ void parseCommand(int argc,char *cmd[]) {
             }
         }
     } else if (strcmp(cmd[0],"test")) {
-        char *msg = "Pe";
-        syscall(1,(int)msg,0,0,0,0);
+        // DO PAGE FAULT
+        int *p = (int *)0xfffffff;
+        *p = 2;
     } else if (strcmp(cmd[0],"fdump")) {
         if (argc > 1) {
             vfs_node_t *file = vfs_finddir(vfs_getRoot(),cmd[1]);
@@ -207,9 +210,8 @@ void parseCommand(int argc,char *cmd[]) {
         }
 #ifdef DEBUG
     } else if (strcmp(cmd[0],"lockidle")) {
-        // DEBUG: lock IDLE task
-        process_waitPid(0);
-        printf("debug: successfull!\n");
+        printf("ATTEMPT TO USE UNDEFINED FUNCTION!\n");
+        PANIC("See.");
     } else if (strcmp(cmd[0],"unlockidle")) {
         process_unblock(0);
     } else if (strcmp(cmd[0],"dump")) {
@@ -219,9 +221,12 @@ void parseCommand(int argc,char *cmd[]) {
             int pid = atoi(cmd[1]);
             process_dump(process_getProcess(pid));
         }
-    } else if (strcmp(cmd[0],"rme")) {
-        syscall(21,0,0,0,0,0);
 #endif
+    } else if (strcmp(cmd[0],"rme")) {
+        struct process *child = NULL;
+        if ((child = process_create((int)kshell_main,false,"kk",0,NULL)) != NULL) {
+            syscall(22,child->pid,0,0,0,0);
+        }
     } else if (strcmp(cmd[0],"ps")) {
         process_dumpAll();
     } else if (strcmp(cmd[0],"kill")) {
@@ -231,7 +236,12 @@ void parseCommand(int argc,char *cmd[]) {
         }
     } else if (strcmp(cmd[0],"pid")) {
         printf("%d\n",process_getCurrentPID());
-    }  else {
+    }  else if (strcmp(cmd[0],"waittime")) {
+        int how = atoi(cmd[1]);
+        process_wait(process_getCurrentPID(),how);
+        struct process *me = process_getProcess(process_getCurrentPID());
+        while(me->state == PROCESS_WAITING) {}
+    } else {
         printf("Unknown command: \"%s\"\n",cmd[0]);
     }
 }

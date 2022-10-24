@@ -22,23 +22,9 @@ clist_definition_t *task_list;
 struct process *idle;
 bool disableScheduler;
 void __process_destroy(struct process *task);
-int _priv_syscall(int num,int p1,int p2,int p3,int p4,int p5) {
-    // use asm macro for it
-    int ret = 0;
-    asm volatile("int %1\n" 
-                : "=a" (ret) 
-                : "i" (0x80),
-                "a" (num),
-                "d" (p1),
-                "c" (p2),
-                "b" (p3),
-                "D" (p4),
-                "S" (p5)
-                : "cc", "memory");
-    return ret;
-}
 void idle_task() {
     // test execute kshell using it
+    arch_enableInterrupts();
     for (;;) {}
 }
 struct process *process_findByStatus(int status);
@@ -67,7 +53,7 @@ struct process *process_allocateProcess() {
 	return r;
 }
 /* Create process */
-struct process *process_create(int entryPoint,bool isUser,char *name) {
+struct process *process_create(int entryPoint,bool isUser,char *name,int argc,char **argv) {
     // Before creating any process, disable scheduler!
     disableScheduler = true;
 #ifdef DEBUG
@@ -75,8 +61,9 @@ struct process *process_create(int entryPoint,bool isUser,char *name) {
 #endif
 	struct process *p = process_allocateProcess();
 	if (p->used) {
-		void *frame = arch_buildStack(entryPoint,isUser);
+		void *frame = arch_buildStack(entryPoint,isUser,argc,argv);
 		p->esp = frame;
+        arch_set_active_thread(p);
 		p->name = name;
 		p->kernelESP = (isUser ? ((int)pmml_alloc(true)+4096) : 0);
 		p->dir = ((isUser ? 0 : (int)vmm_getCurrentDirectory()));
@@ -94,6 +81,8 @@ struct process *process_create(int entryPoint,bool isUser,char *name) {
         }
 		p->workDir = vfs_getRoot();
         p->user = isUser;
+        p->uid = pa->uid;
+        p->guid = pa->guid;
 		curTasks++;
         disableScheduler = false;
 	}
@@ -107,10 +96,9 @@ void process_init() {
 	task_list->head = NULL;
 	task_list->slot_size = sizeof(struct process);
 	// register our interrupt handler here
-	idle = process_create((int)idle_task,false,"idle");
+	idle = process_create((int)idle_task,false,"idle",0,NULL);
     idle->state = 0;
 	//fswitch = true;
-    runningTask = NULL;
     interrupts_addHandler(32,process_schedule);
 #ifdef DEBUG
     write_serialString("proc: waitpid,kill,exit: not implemented!\r\n");
@@ -129,10 +117,16 @@ void process_dump(struct process *pr) {
 	printf("Pages count: %d\n",pr->pages);
 	printf("State: %d\n",pr->state);
 	printf("Parent: %d\n",pr->parent);
-    printf("Entry point: %x\n",(((registers_t *)pr->esp)->eip));
+    registers_t *regs = (registers_t *)pr->esp;
+    printf("Entry point: %x\n",regs->eip);
+    printf("User mode:  %x\n",regs->cs);
 	printf("End of dump\n");
 }
 void process_yield() {
+    if (runningTask != NULL) {
+        runningTask->reschedule = true;
+    }
+    arch_enableInterrupts();
 	asm volatile("int $32");
 }
 void process_schedule(registers_t *stack) {
@@ -140,33 +134,55 @@ void process_schedule(registers_t *stack) {
     // Simple, just find a task then switch to it.
     // Find any task that need to be killed
     if (disableScheduler) return;
+    // This killing and waiting tasks handling code need to be more optimized
     struct process *kill = process_findByStatus(PROCESS_KILLING);
     if (kill != NULL) {
+            if (runningTask == kill) {
+                // Switch to kernel directory
+                runningTask = idle;
+            }   
         __process_destroy(kill);
-        if (runningTask == kill) {
-            runningTask = NULL;
+    }
+    struct process *waiting = process_findByStatus(PROCESS_WAITING);
+    if (waiting != NULL) {
+        if (waiting->wait_time-- == 0) {
+            waiting->state = PROCESS_RUNNING;
+            runningTask->quota = PROCESS_QUOTA;
+            write_serialString("proc: waiting time reseted\r\n");
         }
     }
+    struct process *nextTask = NULL;
     if (runningTask != NULL) {
-        // Simply select new task
-        runningTask->esp = (void *)stack;
-        /*write_serialString("Save for ");
-        write_serialString(runningTask->name);
-        write_serialString("\r\n");*/
-        runningTask = process_findNextByStatus(PROCESS_RUNNING,runningTask->lAddr);
-        runningTask->quota = 0;
+        if (runningTask->lAddr == 0) {
+            nextTask = NULL;
+        } else {
+            if (runningTask->quota < PROCESS_QUOTA && !runningTask->reschedule) {
+                runningTask->quota++;
+                return;
+            }
+            // Simply select new task
+            nextTask = process_findNextByStatus(PROCESS_RUNNING,runningTask->lAddr);
+            nextTask->quota = 0;
+            nextTask->reschedule = false;
+        }
     } else {
         // first switch
-        runningTask = process_findByStatus(PROCESS_RUNNING);
+        nextTask = process_findByStatus(PROCESS_RUNNING);
     }
-    if (runningTask == NULL) {
+    if (nextTask == NULL) {
         // okay switch to idle
-        runningTask = idle;
+        printf("Switching to idle\n");
+        nextTask = idle;
     }
+    //if (nextTask == runningTask) return;
     // change the TSS and VMM
-    tss_set_stack(0x10,runningTask->kernelESP);
-    vmm_switch((int *)runningTask->dir);
-	arch_switchContext(runningTask->esp);
+    tss_set_stack(0x10,nextTask->kernelESP);
+    if (nextTask->dir == 0) {
+        printf("proc: task %s directory are null, WTF?\n",nextTask->name);
+        return;
+    }
+    vmm_switch((int *)nextTask->dir);
+    arch_switchContext(nextTask);
 }
 int process_getCurrentPID() {
 	if (runningTask == NULL) {
@@ -182,6 +198,10 @@ void process_exit(int pid,int exitCode) {
         // only test!
         // re-create init
         PANIC("Init died, or exited");
+    }
+    if (runningTask->pid == pid) {
+        // Beause we use the quota, set runningTask to idle
+        runningTask = idle;
     }
 	process_getProcess(pid)->state = 1;
     arch_enableInterrupts();
@@ -204,7 +224,15 @@ void process_unblock(int pid) {
 	process_getProcess(pid)->state = PROCESS_RUNNING;
 }
 void process_wait(int pid,int ms) {
-	process_getProcess(pid)->wait_time = ms/10;
+    struct process *task = process_findID(pid);
+    if (task == NULL || task->wait_time > 0) {
+        printf("process_wait: bad call, type: %s, %x\n",(task == NULL ? "TYPE_INVALID_PARAMETER" : "TYPE_INVALID_TASK_WAIT_TIME"),(task == NULL ? 0 : task->wait_time));
+        return; // bad call
+    }
+	task->wait_time = ms/10;
+    task->state = PROCESS_WAITING;
+    task->quota = PROCESS_QUOTA;
+    process_yield();
 }
 void process_waitPid(int pid) {
     arch_disableIRQ();
@@ -254,26 +282,35 @@ bool process_findIdDispatcher(clist_head_t *head,va_list args) {
 }
 void __process_destroy(struct process *task) {
 	if (true) { // idle task hasn't waiting for any pid
+        vmm_switch((int*)idle->dir);
 		struct process *parent = process_findID(task->parent);
-        	if (parent == NULL) {
-            		printf("W: parent %d of %d null, reseting running task!\n",task->parent,task->pid);
-            		runningTask = NULL;
-         	}
+        if (parent == NULL) {
+                printf("W: parent %d of %d null, reseting running task!\n",task->parent,task->pid);
+                runningTask = NULL;
+        }
+        if (parent->state != PROCESS_WAITPID) {
+            printf("W: process didn't call waitpid()!\n");
+        }
 		process_unblock(parent->pid);
 		curTasks--;
-		arch_destroyStack(task->esp);
+        if (task->arch_task != 0) {
+            arch_destroyStack(task->arch_task);
+            pmml_free(task->arch_task);
+        }
 		pmml_free(task->esp);
+		/*
+         * We don't free the memory, because i have bug here
+         * so it's need to be rewriten and will be enabled
+         * Sergij Yevchuk - Main Developer
+         */
+        for (int i = 0; i < task->pages; i++) {
+            pmml_free((void *)task->page_start+(i*496));
+        }
 		if (task->user) {
             		pmml_free((void *)task->dir);
         }
 		if (task->kernelESP != 0) {
 			pmml_free((void *)task->kernelESP);
-		}
-		if (task->page_start != 0) {
-			for (int i = 0; i < task->pages; i++) {
-                int addr = vmm_translate((int *)task->dir,task->page_start+(i*4096));
-                pmml_free((void *)addr);
-            }
 		}
 		clist_delete_entry(task_list,(clist_head_t *)task->lAddr);
 		pmml_free(task);

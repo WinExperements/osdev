@@ -3,15 +3,14 @@
 #include "syscall.h"
 #include "string.h"
 #include "stdarg.h"
+char __stdio_buf[200];
 /* Print string on screen */
-void printf(char *message,...) {
+void printf(const char *message,...) {
 	va_list l;
 	va_start(l,message);
-	char *b = malloc(100);
-	vsprintf(b,message,l);
-	helin_syscall(1,(int)b,0,0,0,0);
+	vsprintf(__stdio_buf,message,l);
+	helin_syscall(1,(int)__stdio_buf,0,0,0,0);
 	va_end(l);
-	free(b);
 }
 FILE *fopen(char *file,char *mode) {
 	if (!file) return NULL;

@@ -8,6 +8,13 @@
 #include<process.h>
 #define PUSH(tos,val) (*(-- tos) = val)
 void gpf_exc(registers_t *);
+void x86_userSwitch(int entryPoint,int user_esp);
+void x86_switchStacks(registers_t *regs);
+typedef struct _x86_arch_task {
+    int iframe;
+    int ustack;
+} x86_arch_task;
+struct process *__active;
 void arch_init(struct multiboot_info *info) {
 	terminal_initialize(info);
 	init_serial();
@@ -71,25 +78,35 @@ void arch_enableIRQ() {
 	io_writePort(0x21, 0x00);            // Enable all IRQs
    	io_writePort(0xa1, 0x00);             // Enable all IRQs
 }
-void *arch_buildStack(int entryPoint,bool isUser) {
+void *arch_buildStack(int entryPoint,bool isUser,int argc,char **argv) {
 #ifdef DEBUG
     write_serialString("x86: building process stack\r\n");
 #endif
-	registers_t *frame = (pmml_alloc(true));
-	frame->eflags = 0x202;
-	frame->cs    = (isUser ? 0x1b : 0x8);
- 	frame->eip   = entryPoint;
- 	frame->ebp   = 0;
-  	frame->edi   = 0;
-  	frame->esi   = 0;
-  	frame->edx   = 0;
-  	frame->ecx   = 0;
-  	frame->ebx   = 0;
-  	frame->eax   = 0;
-  	frame->ds    = (isUser ? 0x23 : 0x10);
-    frame->ss = frame->ds;
-	frame->useresp = (isUser ? ((int)pmml_alloc(true)+4096) : 0);
-	return (void *)(int)frame;
+	int *s = pmml_alloc(true);
+    if (isUser) { // remember: kernel tasks/threads never use arguments!
+        /*
+         * If task is user then allocate user esp and set
+         * entry point to x86_userSwitch
+         */
+        int *user_esp = pmml_alloc(true);
+        PUSH(user_esp,(int)argv);
+        PUSH(user_esp,argc);
+        PUSH(s,(int)user_esp);
+        PUSH(s,entryPoint);
+        PUSH(s,0);
+        PUSH(s,(int)x86_userSwitch);
+        /*PUSH(s,(int)argv);
+        PUSH(s,argc);*/
+    } else {
+        PUSH(s,0);
+        PUSH(s,entryPoint);
+    }
+    //PUSH(s,entryPoint);
+    PUSH(s,0);
+    PUSH(s,0);
+    PUSH(s,0);
+    PUSH(s,0);
+	return (void *)(int)s;
 }
 void arch_disableInterrupts() {
 	asm volatile("cli");
@@ -109,37 +126,46 @@ void arch_copy_process_args(struct process *p,int argc,char **argv,char **envp) 
 #ifdef DEBUG
     write_serialString("x86: copying user arguments into stack\r\n");
 #endif
-	// First we need to get the user stack, but first check if task are in user mode
-	registers_t *fr = (registers_t *)p->esp;
-	int *stack = (int *)fr->useresp;
-    if (stack == NULL) {
-        // Kernel mode thread
-#ifdef DEBUG
-        write_serialString("x86: warrning kernel thread will not use arguments!\r\n");
-#endif
-        return;
-    }
-	PUSH(stack,(int)argv);
-	PUSH(stack,argc);
-    PUSH(stack,(int)envp);
-	fr->useresp = (int)stack;
-#ifdef DEBUG
-    	write_serialString("x86: arguments pushed\r\n");
-#endif
 	// Here we done!
 }
 void arch_destroyStack(void *stack) {
-#ifdef DEBUG
-    write_serialString("Destroying stack\r\n");
-#endif
-	registers_t *fr = (registers_t *)stack;
-	if (fr->useresp != 0) {
-		pmml_free((void *)fr->useresp-4);
-        pmml_free((void *)fr->useresp-12);
-		pmml_free((void *)fr->useresp);
-	}
+    // Destroy our arch_task
+    x86_arch_task *task = (x86_arch_task *)stack;
+    // Free our IFRAME and user stack
+    pmml_free((void *)task->iframe);
+    pmml_free((void *)task->ustack);
 }
-void arch_switchContext(void *stack) {
-    asm volatile("movl %%eax,%%esp" : : "a" (stack));
-    asm volatile("jmp irq_handler_exit");
+void x86_userSwitch(int entryPoint,int stack) {
+    /* 
+     * Description of this code:
+     * We are allocate and fill our interrupt frame, 
+     * after that we just restore it using irq_handler_exit
+     * after it we in our userspace entry point and
+     * user mode selectors, so after the timer interrupt
+     * invoked and scheduler called arch_switchContext it will do nothing,
+     * so our IRQ handler restored our user space selectors
+     * and returns to entry point.
+     * 
+     * USER MODE FINALLY WORKS!
+     */
+    registers_t *regs = pmml_alloc(true);
+    regs->eax = regs->ecx = regs->edx = regs->ebx = regs->ebp = regs->esi = regs->edi = 0;
+    regs->ds = 0x23;
+    regs->cs = 0x1b;
+    regs->eip = entryPoint;
+    regs->ss = regs->ds;
+    regs->eflags = 0x200;
+    regs->useresp = stack;
+    // Now restore it using our assembly code
+    // before the actual switch, create and fill our arch_task
+    if (__active != NULL) {
+        x86_arch_task *a = pmml_alloc(true);
+        //a->iframe = (int)regs;
+        a->ustack = stack;
+        __active->arch_task = (void *)a;
+    }
+    x86_switchStacks(regs);
+}
+void arch_set_active_thread(struct process *active) {
+    __active = active;
 }

@@ -35,6 +35,7 @@ typedef struct vfs_fs {
 } vfs_fs_t;
 void vfs_init();
 void vfs_addFS(vfs_fs_t *fs);
+vfs_fs_t *vfs_findFS(char *name);
 void vfs_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
 void vfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
 void vfs_open(vfs_node_t *node,bool w,bool r);

@@ -52,6 +52,7 @@ void tty_read(char *buff,int how) {
         return;
     } else if (c == '\b') {
         if (i > 0) {
+            terminal_writeXY(' ',terminal_getX()-1,terminal_getY());
             i--;
         }
     } else if (c >= 0x20 && c <= 0x7e) {

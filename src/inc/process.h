@@ -8,27 +8,36 @@
 #define PROCESS_KILLING 1
 #define PROCESS_WAITPID 2 // process waiting for childs
 #define PROCESS_QUOTA 10
+#define PROCESS_WAITING 3
 typedef struct _stackFrame stackFrame;
 struct process {
+    /* Process information */
 	void *esp;
 	struct process *next;
+    /* Scheduler information */
 	bool used;
 	int pid;
-  char *name;
-  int kernelESP;
-  uint32_t dir;
-  int state;
-  int pages;
-  msg_t messages[10];
-  int message_count;
-  int wait_time;
-  int parent;
-  struct process *child;
-  int lAddr;
-  vfs_node_t *workDir;
-  int page_start;
-  int quota;
-  bool user;
+    char *name;
+    /* Context information */
+    int kernelESP;
+    uint32_t dir;
+    /* Other information about the process */
+    int state;
+    int pages;
+    msg_t messages[10];
+    int message_count;
+    int wait_time;
+    int parent;
+    struct process *child;
+    int lAddr;
+    vfs_node_t *workDir;
+    int page_start;
+    int quota;
+    bool user;
+    bool reschedule;
+    void *arch_task; // Architecture dependes task structure
+    int uid;
+    int guid;
 };
 extern struct process *runningTask;
 /* 
@@ -41,7 +50,7 @@ void process_init();
  @param isUser - Is task must runned in user mode
  @param name Task name
 */
-struct process *process_create(int entry,bool isUser,char *name);
+struct process *process_create(int entry,bool isUser,char *name,int argc,char **argv);
 /*
  * Delete the task from process list
 */
@@ -59,7 +68,7 @@ stack - Current Stack
 Return Value:
 Next task stack
  */
-void process_schedule(registers_t *stack);
+void process_schedule();
 /*
  * Return current process ID
 */

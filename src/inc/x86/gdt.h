@@ -55,4 +55,5 @@ void tss_write(s32 num,uint32_t ss0,uint32_t esp0);
 void tss_set_stack(uint32_t,uint32_t);
 extern void gdt_flush(int);
 extern void tss_flush();
+struct tss_entry_struct *tss_getTSS();
 #endif

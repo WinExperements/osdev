@@ -11,6 +11,26 @@
 idt_entry_t idt_entries[256];
 idt_ptr_t idt_ptr;
 isr_t interrupt_handlers[128];
+// Reserve our exceptions descriptions here
+static const char *exception_names[] = {
+	"division by zero",
+	"debug exception",
+	"nonmaskable interrupt",
+	"breakpoint",
+	"overflow",
+	"bounds check",
+	"invalid instruction",
+	"coprocessor error",
+	"double fault",
+	"copressor overrun",
+	"invalid task",
+	"segment not present",
+	"stack exception",
+	"general protection fault",
+	"page fault",
+	"unknown",
+	"coprocessor error"
+};
 void init_idt() {
   idt_ptr.limit = sizeof(idt_entry_t) * 256 -1;
     idt_ptr.base  = (uint32_t)&idt_entries;
@@ -92,21 +112,20 @@ void idt_set_gate(uint8_t num,uint32_t base,uint16_t sel,uint8_t flags) {
   idt_entries[num].flags   = flags | 0x60;
 }
 void isr_handler(registers_t *regs) {
-  /*if (process_getCurrentPID() != 0) {
-    printf("Exception %d. Killing %d\n",regs->int_no,process_getCurrentPID());
-    arch_enableInterrupts();
-    process_kill(process_getCurrentPID());
-  }*/
-  if (interrupt_handlers[regs->int_no] != 0) {
-    isr_t handler = interrupt_handlers[regs->int_no];
-    handler(regs);
-  } else {
-    printf("Not Handled CPU exception %d %d\n",regs->int_no,regs->error_code);
-    PANIC("Unhandled Exception");
-  }
+    int int_no = regs->int_no;
+    struct process *prc = process_getProcess(process_getCurrentPID());
+    if (prc != NULL && prc->user) {
+        printf("%s in process %d\n",exception_names[int_no],prc->pid);
+        process_kill(prc->pid);
+        arch_enableInterrupts();
+        process_yield();
+    } else {
+        PANIC(exception_names[int_no]);
+    }
 }
 int irq_handler(registers_t *regs)
 {
+    if (regs == NULL) return NULL;
   // Send the EOI signal to the Slave
   // Slave handles the Interrupt from 40 to 47
     io_writePort(PIC_SLAVE_COMMAND , 0x20);
@@ -122,6 +141,9 @@ int irq_handler(registers_t *regs)
     {
       isr_t handler = interrupt_handlers[regs->int_no];
       handler(regs);
+    }
+    if (regs == NULL) {
+        PANIC("IRQ registers seems broken!");
     }
     return (int)regs;
 }

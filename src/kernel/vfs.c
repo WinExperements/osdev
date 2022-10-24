@@ -9,7 +9,6 @@ vfs_fs_t *fs_start;
 vfs_node_t *fs_root;
 vfs_node_t *vfs_find_impl(vfs_node_t *start,char *path);
 void vfs_init() {
-    printf("VFS: version 1.0\n");
 #ifdef DEBUG
     write_serialString("vfs: initialized\r\n");
 #endif
@@ -175,4 +174,14 @@ void vfs_node_path(vfs_node_t *node,char *path,int size) {
         }
         strcpy(path,target_path+char_index+1);
     }
+}
+vfs_fs_t *vfs_findFS(char *name) {
+    vfs_fs_t *start = fs_start;
+    while(start != NULL) {
+        if (strcmp(start->fs_name,name)) {
+            return start;
+        }
+        start = start->next;
+    }
+    return NULL;
 }

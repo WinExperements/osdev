@@ -37,15 +37,16 @@ static void *syscalls[] = {
 	&sys_readdir,
 	&sys_exec_shell,
     &sys_waitpid,
-    &sys_getppid
+    &sys_getppid,
+    &sys_sysinfo,
+    &sys_getuid,
+    &sys_setuid
 };
 registers_t *syscall_handler(registers_t *regs) {
-	if (regs->eax > 23) {
+	if (regs->eax > 26) {
 		printf("No such syscall number: %d\n",regs->eax);
-		process_kill(process_getCurrentPID());
-		process_yield();
 	} else {
-		arch_enableInterrupts();
+        arch_enableInterrupts();
 		int (*handler)(int,int,int,int,int) = (int (*)(int,int,int,int,int))syscalls[regs->eax];
 		regs->eax = handler(regs->edx,regs->ecx,regs->ebx,regs->edi,regs->esi);
 	}
@@ -118,7 +119,6 @@ int sys_free(int p1,int p2,int p3,int p4,int p5) {
 	return 0;
 }
 int sys_exec(int p1,int p2,int p3,int p4,int p5) {
-    process_disableScheduler();
 	char *path = (char *)p1;
 	vfs_node_t *node = vfs_find(path);
 	if (!node) return -1;
@@ -126,17 +126,17 @@ int sys_exec(int p1,int p2,int p3,int p4,int p5) {
 		printf("%s: directory\n",p1);
 		return -2;
 	}
-	void *addr = pmml_allocPages((node->size/4096),true);
+	int pages = (node->size/4096)+1;
+	void *addr = pmml_allocPages(pages,true);
 	vfs_read(node,0,node->size,addr);
 	if (!elf_load_file(addr,true,node->name,p2,(char **)p3,(char **)p4)) {
         	printf("exec: loading elf failed!\n");
-            pmml_freePages(addr,(node->size/4096));
+            pmml_freePages(addr,pages);
         	arch_enableInterrupts();
 		return -2;
 	}
-	pmml_freePages(addr,(node->size/4096));
-    process_enableScheduler();
-   // process_dump(process_getProcess(process_getProcesses()-1));
+	pmml_freePages(addr,pages);
+   	// process_dump(process_getProcess(process_getProcesses()-1));
 	return process_getNextPID()-1;
 }
 int sys_reboot(int p1,int p2,int p3,int p4,int p5) {
@@ -182,8 +182,34 @@ int sys_readdir(int p1,int p2,int p3,int p4,int p5) {
 	}
 	return 0;
 }
+/* Mount syscall not shell execution !! */
 int sys_exec_shell(int p1,int p2,int p3,int p4,int p5) {
-    return 0;
+    	// allocate and copy parameters from user
+	char *dev = copy_from_user((void *)p1);
+	char *_mount_dir = copy_from_user((void *)p2);
+	char *_fs = copy_from_user((void *)p3);
+	vfs_node_t *dev_path = vfs_find(dev);
+    	if (dev_path == NULL) {
+		pmml_free(dev);
+                pmml_free(_mount_dir);
+                pmml_free(_fs);
+		return -2;
+	}
+    	vfs_node_t *mount_dir = vfs_find(_mount_dir);
+    	if (mount_dir == NULL) {
+		pmml_free(dev);
+                pmml_free(_mount_dir);
+                pmml_free(_fs);
+		return -3;
+	}
+    	vfs_fs_t *fs = vfs_findFS(_fs);
+    	if (fs == NULL) {
+		pmml_free(dev);
+		pmml_free(_mount_dir);
+		pmml_free(_fs);
+		return -4;
+	}
+    	return 0;
 }
 int sys_waitpid(int p1,int p2,int p3,int p4,int p5) {
     if (p1 > 0) {
@@ -203,5 +229,27 @@ int sys_getppid(int p1,int p2,int p3,int p4,int p5) {
     if (parent != NULL) {
         return parent->pid;
     }
+    return 0;
+}
+int sys_sysinfo(int p1,int p2,int p3,int p4,int p5) {
+    int all = pmml_getMaxBlocks()*4096/1024;
+    int free = pmml_getFreeBlocks()*4096/1024;
+    int used = all-free;
+    printf("HelinOS compiled with GCC %s. Kernel compiled at %s:%s\n",__VERSION__,__DATE__,__TIME__);
+    printf("Memory detected: %dKB, used: %dKB, free: %dKB %d pages\n",all,used,free,pmml_getFreeBlocks());
+    return 0;
+}
+void *copy_from_user(void *from) {
+	if (!from) return NULL;
+	void *ret = pmml_alloc(true);
+	memcpy(ret,from,strlen((char *)from));
+	return ret;
+}
+int sys_getuid(int p1,int p2,int p3,int p4,int p5) {
+    // Return UID from running task
+    return process_getProcess(process_getCurrentPID())->uid;
+}
+int sys_setuid(int p1,int p2,int p3,int p4,int p5) {
+    process_getProcess(process_getCurrentPID())->uid = p1;
     return 0;
 }

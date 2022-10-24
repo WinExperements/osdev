@@ -2,6 +2,7 @@
 #define SYSCALL_H
 #include <typedefs.h>
 #include <x86/idt.h>
+// Yeah wierd code
 int sys_print(int p1,int p2,int p3,int p4,int p5);
 int sys_exit(int p1,int p2,int p3,int p4,int p5);
 int sys_kill(int p1,int p2,int p3,int p4,int p5);
@@ -25,5 +26,13 @@ int sys_readdir(int p1,int p2,int p3,int p4,int p5);
 int sys_exec_shell(int p1,int p2,int p3,int p4,int p5);
 int sys_waitpid(int p1,int p2,int p3,int p4,int p5);
 int sys_getppid(int p1,int p2,int p3,int p4,int p5);
+int sys_sysinfo(int p1,int p2,int p3,int p4,int p5);
+int sys_getuid(int p1,int p2,int p3,int p4,int p5);
+int sys_setuid(int p1,int p2,int p3,int p4,int p5);
 registers_t *syscall_handler(registers_t *regs);
+/*
+ * Because we can't directly modify user memory,
+ * we need to copy it into kernel using allocation and memcpy
+*/
+void *copy_from_user(void *from);
 #endif

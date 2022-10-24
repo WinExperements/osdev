@@ -185,8 +185,8 @@ syscall_irq:
 [GLOBAL scheduler_irq]
 extern process_schedule
 extern runningTask
-extern write_serialString
+extern arch_switchContext
 scheduler_irq:
-  push 0
-  push 32
-  jmp irq_common_stub
+    push 0
+    push 32
+    jmp irq_common_stub

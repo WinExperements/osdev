@@ -1,8 +1,6 @@
 # About
 A hobby operation system written in C and assembly for X86 i386 PC.<br>
 You can use source of this project :)<br>
-Here the screnshot:<br>
-![alt text](screenshot.png)
 # Features
 Current list of features and released components:
 - [x] Global description table

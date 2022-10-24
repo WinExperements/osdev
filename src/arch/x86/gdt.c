@@ -44,3 +44,6 @@ void tss_set_stack(uint32_t ss,uint32_t esp) {
   tss_entry.ss0 = ss;
   tss_entry.esp0 = esp;
 }
+struct tss_entry_struct *tss_getTSS() {
+    return &tss_entry;
+}

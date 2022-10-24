@@ -8,10 +8,14 @@
 bool doexit = false;
 char path[128];
 int pid,ppid;
+char buff[128];
 void sh_parseCommand(char **argv,int argc);
-bool execute(char *command);
+bool execute(char *command,char **argv,int argc);
+int __argc;
+char **__argv;
 int main(int argcf,char **argvf) {
-    if (argcf < 1) return 0;
+    __argc = argcf;
+    __argv = argvf;
     //if (strcmp(argvf[1],"init")) return 0;
     pid = getpid(); // remember pid for waitpid
     ppid = getppid();
@@ -61,12 +65,16 @@ void sh_parseCommand(char **argv,int argc) {
         }
         closedir(d);
     } else if (!strcmp(argv[0],"fault")) {
-        int u = 1;
-        int a = 0;
-        int i = u/a;
+        uint32_t *a = (uint32_t *)0xf0000000;
+        uint32_t aa = *a;
     } else if (!strcmp(argv[0],"mpe")) {
         helin_syscall(21,0,0,0,0,0);
         waitpid(pid,NULL,0);
+    } else if (!strcmp(argv[0],"args")) {
+        printf("arguments: %u\n",__argc);
+        for (int i = 0; i < __argc+1; i++) {
+            printf("%s\n",__argv[i]);
+        }
     } else if (argv[0][0] == '/') {
         int _pid = 0;
         if ((_pid = execv(argv[0],0,NULL)) > 0) {
@@ -74,29 +82,81 @@ void sh_parseCommand(char **argv,int argc) {
             //printf("shell: spawned process: %u\n",_pid);
             waitpid(_pid,NULL,0);
         } else {
-            printf("Execution fail\n");
+            printf("%s: no such file or directory\n",argv[0]);
+        }
+    } else if (!strcmp(argv[0],"help")) {
+        printf("HelinOS userspace shell version 0.3\n");
+        printf("reboot - reboot system\n");
+        printf("poweroff - shutdown the emulator or halt the system\n");
+        printf("clear - you know.\n");
+        printf("exit - exit\n");
+        printf("cd - change directory\n");
+        printf("ls - list directory\n");
+        printf("fault - only debug!\n");
+        printf("mpe - didn't work\n");
+        printf("args - print arguments information passed to the program\n");
+    } else if (!strcmp(argv[0],"loop")) {
+        for (;;) {}
+    } else if (!strcmp(argv[0],"cli")) {
+        printf("WARRNING: this command must only check the user task working via invoking privileged instruction!!\n");
+        asm volatile("cli");
+        // IF we here, so user mode are fake
+    } else if (!strcmp(argv[0],"kill")) {
+        if (argc == 1) {
+            printf("kill - internal shell command\nuse kill <pid>\n");
+            return;
+        }
+        int pid = atou(argv[1]);
+        helin_syscall(3,pid,0,0,0,0);
+    } else if (!strcmp(argv[0],"sysinfo")) {
+        helin_syscall(24,0,0,0,0,0);
+    } else if (!strcmp(argv[0],"id")) {
+        int uid = getuid();
+        printf("UID: %u\n",uid);
+    } else if (!strcmp(argv[0],"setuid")) {
+        if (argc > 1) {
+            int uid = atou(argv[1]);
+            setuid(uid);
+        } else {
+            printf("setuid <uid>\n");
         }
     } else {
-        if (!execute(argv[0])) {
+        if (!execute(argv[0],argv,argc)) {
             printf("Commmand %s not found\n",argv[0]);
         }
     }
 }
-bool execute(char *command) {
+bool execute(char *command,char **argv,int argc) {
     char *run_path = "/bin";
     int _pid = 0;
+    char **new_argv = NULL;
+    int new_argc = argc-1;
     if (run_path == NULL) {
         printf("cannot find PATH enviroment variable!\n");
         return false;
     }
-    char *buff = malloc(100);
+    bool parallel = false;
+    if (argc > 1) {
+        // check if we need to execute it paralell
+        if (!strcmp(argv[argc-1],"&")) {
+            parallel = true;
+            argc--;
+        }
+        new_argv = malloc(100);
+        for (int i = 0; i < argc; i++) {
+            new_argv[i] = argv[i];
+        }
+    }
     sprintf(buff,"%s/%s",run_path,command);
-    if ((_pid = execv(buff,0,NULL)) > 0) {
-        free(buff);
-        waitpid(_pid,NULL,0);
+    if ((_pid = execv(buff,new_argc,new_argv)) > 0) {
+        if (!parallel) {
+            waitpid(_pid,NULL,0);
+            if (new_argv != NULL) {
+                free(new_argv);
+            }
+        }
         return true;
     } else {
-        free(buff);
         return false;
     }
     return false;

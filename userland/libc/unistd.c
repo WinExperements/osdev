@@ -13,3 +13,9 @@ int execv(char *path,int argc,char *argv[]) {
 pid_t getppid() {
     return helin_syscall(23,0,0,0,0,0);
 }
+uid_t getuid() {
+    return helin_syscall(25,0,0,0,0,0);
+}
+int setuid(uid_t uid) {
+    return helin_syscall(26,uid,0,0,0,0);
+}

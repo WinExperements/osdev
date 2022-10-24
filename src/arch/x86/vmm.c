@@ -48,18 +48,25 @@ void vmm_init() {
 #endif
  }
 void vmm_pfault(registers_t *regs) {
-	uint32_t addr = 0;
+    uint32_t addr = 0;
     uint32_t cr3 = 0;
-  asm volatile("mov %%cr2, %0" : "=r"(addr));
-  asm volatile("mov %%cr3, %0" : "=r"(cr3));
-  bool present = regs->error_code & 0x1;
+    asm volatile("mov %%cr2, %0" : "=r"(addr));
+    asm volatile("mov %%cr3, %0" : "=r"(cr3));
+    if (process_getProcess(process_getCurrentPID())->user) {
+        printf("Segmentation fault. at %x\n",addr);
+        process_kill(process_getCurrentPID());
+        arch_enableInterrupts();
+        process_yield();
+    }
+  bool present = !(regs->error_code & 0x1);
   bool rw = regs->error_code & 0x2;
   bool us = regs->error_code & 0x4;
   bool reserved = regs->error_code & 0x8;
   bool fetch = regs->error_code & 0x10;
-  printf("Page fault at %x, detailed info\n",addr);
+  printf("Page fault at %x, detailed info: %x\n",addr,regs->error_code);
   printf("Present: %d\nRW: %d\nUser: %d\nReserved: %d\nFetch: %d\n",present,rw,us,reserved,fetch);
   printf("Current directory address: %x\nRegistered address: %x\n",cr3,current_dir);
+  //process_dump(process_getProcess(process_getCurrentPID()));
   while(1) {}
 }
 void vmm_enable() {
@@ -114,10 +121,10 @@ int *vmm_getCurrentDirectory() {
 }
 int *vmm_createDirectory() {
   /* Clone the kernel directory then return */
-  int *directory = pmml_alloc(true);
-  int *bios = pmml_alloc(true);
-  int *gb3 = pmml_alloc(true);
-  int *frameBuffer = pmml_alloc(true);
+  int *directory = pmml_allocPages(2,true);
+  int *bios = pmml_allocPages(2,true);
+  int *gb3 = pmml_allocPages(2,true);
+  int *frameBuffer = pmml_allocPages(2,true);
   if (directory == NULL || bios == NULL || gb3 == NULL || frameBuffer == NULL) {
     PANIC("vmm_createTable: NuLL");
   }

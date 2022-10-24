@@ -8,8 +8,10 @@
 #include<mm/pmm.h>
 #include<mm/vmm.h>
 #include <serial.h>
+#include<process.h>
 bool hasKey = false;
-bool keyCode = 0;
+int keyCode = 0;
+bool shift,caps,ctrl = false;
 void keyboard_handler(registers_t *regs);
 void keyboard_keyHandler(char key);
 void keyboard_init() {
@@ -33,6 +35,7 @@ void keyboard_handler(registers_t *regs) {
 	uint8_t key = io_readPort(0x60);
 	if (key < 0x80)
 	{
+        //printf("key: %x\n",key);
 		switch(key)
         {
             case 0x02: keyboard_keyHandler('1'); break;
@@ -41,7 +44,13 @@ void keyboard_handler(registers_t *regs) {
             case 0x05: keyboard_keyHandler('4'); break;
             case 0x06: keyboard_keyHandler('5'); break;
             case 0x07: keyboard_keyHandler('6'); break;
-            case 0x08: keyboard_keyHandler('7'); break;
+            case 0x08: {
+                if (!shift) {
+                    keyboard_keyHandler('7');
+                } else {
+                    keyboard_keyHandler('&');
+                }
+            } break;
             case 0x09: keyboard_keyHandler('8'); break;
             case 0x0A: keyboard_keyHandler('9'); break;
             case 0x0B: keyboard_keyHandler('0'); break;
@@ -69,7 +78,18 @@ void keyboard_handler(registers_t *regs) {
 
             case 0x2C: keyboard_keyHandler('z'); break;
             case 0x2D: keyboard_keyHandler('x'); break;
-            case 0x2E: keyboard_keyHandler('c'); break;
+            case 0x2E: {
+                if (ctrl) {
+                    printf("^C\n");
+                    ctrl = !ctrl;
+                    // kill current thread
+                    process_kill(process_getCurrentPID());
+                    arch_enableInterrupts();
+                    process_yield();
+                    break;
+                }
+                keyboard_keyHandler('c');
+            } break;
             case 0x2F: keyboard_keyHandler('v'); break;
             case 0x30: keyboard_keyHandler('b'); break;
             case 0x31: keyboard_keyHandler('n'); break;
@@ -81,17 +101,14 @@ void keyboard_handler(registers_t *regs) {
             case 0x1C: keyboard_keyHandler('\n'); break;
             case 0x39: keyboard_keyHandler(' '); break;
             case 0xe: {
-                terminal_writeXY(' ',terminal_getX()-1,terminal_getY());
                 keyboard_keyHandler('\b');
             } break;
-            case 0x38: {
-            } break;
-            case 0x1d: {
-            } break;
-            case 0x28: keyboard_keyHandler('\''); break;
+            case 0x2b: keyboard_keyHandler('\\'); break;
+            case 0x2a: {shift = !shift;} break;
+            case 0x1d: {ctrl = !ctrl;} break;
             default:
             {
-                printf("Unhandled key: %x\n",key);
+		printf("Unknown key: %x\n",key);
                 break;
             }
 	}

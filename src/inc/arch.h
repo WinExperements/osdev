@@ -8,10 +8,10 @@ void arch_init(struct multiboot_info *info);
 void arch_reset();
 void arch_poweroff();
 void panic(char *file,const char *funcName,const char *msg);
-void arch_switchToUser();
+void arch_jumpToUser(int entryPoint,int userstack);
 void arch_disableIRQ();
 void arch_enableIRQ();
-void *arch_buildStack(int entryPoint,bool isUserTask);
+void *arch_buildStack(int entryPoint,bool isUserTask,int argc,char **argv);
 void arch_disableInterrupts();
 void arch_enableInterrupts();
 void kassert(const char *file,const char *func,int line,bool exc);
@@ -26,6 +26,7 @@ void arch_destroyStack(void *stack);
     Switch betwen task A and B
     @param stack Stack change to we need
 */
-void arch_switchContext(void *stack);
-void arch_saveRegs(void *from,void *to);
+void arch_switchContext(void *newStack) __attribute__((cdecl));
+void arch_switchToUser();
+void arch_set_active_thread(struct process *active);
 #endif
