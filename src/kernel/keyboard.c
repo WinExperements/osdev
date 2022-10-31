@@ -15,21 +15,16 @@ bool shift,caps,ctrl = false;
 void keyboard_handler(registers_t *regs);
 void keyboard_keyHandler(char key);
 void keyboard_init() {
-    interrupts_addHandler(33,keyboard_handler);
-	unsigned char kbb = 0;
-   	while(((kbb = io_readPort(0x64)) & 1) == 1)
-   	{
-      		io_readPort(0x60);
-   	}
-	while(io_readPort(0x64) & 0x1) {
-		io_readPort(0x60);
+	io_writePort(0x64,0xAD); // disable first PS/2 port
+	io_writePort(0x64,0xA7); // disable second PS/2 port(if supported)
+	while(io_readPort(0x64) & 0) {
 	}
-	io_writePort(0x64,0xae);
-	io_writePort(0x64,0x20);
-	uint8_t status = (io_readPort(0x60) | 1)  & ~0x10;
-	io_writePort(0x64,0x60);
-	io_writePort(0x60,status);
-	io_writePort(0x60,0xf4);
+	// re-enable disabled ports
+	io_writePort(0x64,0xAE);
+	io_writePort(0x64,0xA8);
+	interrupts_addHandler(33,keyboard_handler);
+	// register second PS/2 port interrupt handler
+	interrupts_addHandler(IRQ12,keyboard_handler);
 }
 void keyboard_handler(registers_t *regs) {
 	uint8_t key = io_readPort(0x60);

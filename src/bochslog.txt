@@ -1,0 +1,9 @@
+========================================================================
+                       Bochs x86 Emulator 2.6.11
+              Built from SVN snapshot on January 5, 2020
+                Timestamp: Sun Jan  5 08:36:00 CET 2020
+========================================================================
+Next at t=0
+(0) [0x0000fffffff0] f000:fff0 (unk. ctxt): jmpf 0xf000:e05b          ; ea5be000f0
+[?2004h<bochs:1> [K<bochs:1> c
+[?2004l(0).[88600000] [0x0000000c4426] c000:4426 (unk. ctxt): push ax                   ; 50

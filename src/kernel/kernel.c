@@ -100,13 +100,7 @@ extern void kernel_main(struct multiboot_info *multiboot) {
         }
     }
     printf("Finishing up\n");
-   /* uint32_t *target = pmml_alloc(true);
-    atapi_read_sector((uint32_t)target,0,1);
-    for (int i = 0; i < 256; i++) {
-        printf("%x ",target[i] & 0xff);
-        printf("%x ",(target[i] >> 8) & 0xff);
-    }*/
-   // pmml_free(target);
+   atapi_init();
     if (!disableStartInit) {
         printf("Starting init\n");
         if (!exec_init()) {

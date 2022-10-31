@@ -5,6 +5,6 @@ OBJECTS = stdio.o stdlib.o start.o message.o syscall.o string.o unistd.o dirent.
 %.o: %.asm
 	nasm -f elf32 -o $@ $<
 all: $(OBJECTS)
-	ar rcs libcc.a $(OBJECTS)
+	ar rc libcc.a $(OBJECTS)
 clean:
 	rm *.o

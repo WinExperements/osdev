@@ -24,8 +24,8 @@ clean:
 	rm -rf ../iso/boot/grub/kernel.bin ../iso/boot/init ../iso/boot/test
 makeiso:
 	cp kernel.bin ../iso/boot/grub
-	grub-mkrescue -o myos.iso ../iso
-	#cp ~/myos.iso ./
+	grub-mkrescue -o ~/myos.iso ../iso
+	cp ~/myos.iso ./
 runkernel:
 	"qemu-system-i386" -cpu 486 -kernel kernel.bin -serial stdio -m 256M
 run:
@@ -35,7 +35,7 @@ bochs:
 install:
 	sudo cp kernel.bin /boot/grub
 debug:
-	qemu-system-i386 -cdrom myos.iso -s -S &
+	qemu-system-i386 -kernel kernel.bin -s -S &
 	gdb kernel.bin -tui -x ../debug.gdb
 arm:
 	make -C arch/armv7-a

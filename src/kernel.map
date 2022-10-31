@@ -1,0 +1,1128 @@
+
+Відкинуті розділи вхідних даних
+
+ .group         0x0000000000000000        0x8 arch/x86/terminal.o
+ .group         0x0000000000000000        0x8 arch/x86/terminal.o
+ .group         0x0000000000000000        0x8 arch/x86/terminal.o
+ .group         0x0000000000000000        0x8 arch/x86/terminal.o
+ .group         0x0000000000000000        0x8 kernel/kernel.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/kernel.o
+ .group         0x0000000000000000        0x8 arch/x86/io.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 arch/x86/io.o
+ .group         0x0000000000000000        0x8 arch/x86/serial.o
+ .group         0x0000000000000000        0x8 arch/x86/serial.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 arch/x86/serial.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 arch/x86/serial.o
+ .group         0x0000000000000000        0x8 arch/x86/arch.o
+ .group         0x0000000000000000        0x8 arch/x86/arch.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 arch/x86/arch.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 arch/x86/arch.o
+ .group         0x0000000000000000        0x8 arch/x86/gdt.o
+ .group         0x0000000000000000        0x8 arch/x86/gdt.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 arch/x86/gdt.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 arch/x86/gdt.o
+ .group         0x0000000000000000        0x8 arch/x86/interrupts.o
+ .group         0x0000000000000000        0x8 arch/x86/interrupts.o
+ .group         0x0000000000000000        0x8 arch/x86/interrupts.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 arch/x86/interrupts.o
+ .text.__x86.get_pc_thunk.dx
+                0x0000000000000000        0x4 arch/x86/interrupts.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 arch/x86/interrupts.o
+ .group         0x0000000000000000        0x8 mm/mm.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 mm/mm.o
+ .group         0x0000000000000000        0x8 mm/pmm.o
+ .group         0x0000000000000000        0x8 mm/pmm.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 mm/pmm.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 mm/pmm.o
+ .group         0x0000000000000000        0x8 arch/x86/vmm.o
+ .group         0x0000000000000000        0x8 arch/x86/vmm.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 arch/x86/vmm.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 arch/x86/vmm.o
+ .group         0x0000000000000000        0x8 kernel/mstring.o
+ .group         0x0000000000000000        0x8 kernel/mstring.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/mstring.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/mstring.o
+ .group         0x0000000000000000        0x8 kernel/process.o
+ .group         0x0000000000000000        0x8 kernel/process.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/process.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/process.o
+ .group         0x0000000000000000        0x8 kernel/syscall.o
+ .group         0x0000000000000000        0x8 kernel/syscall.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/syscall.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/syscall.o
+ .group         0x0000000000000000        0x8 kernel/keyboard.o
+ .group         0x0000000000000000        0x8 kernel/keyboard.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/keyboard.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/keyboard.o
+ .group         0x0000000000000000        0x8 arch/x86/pic.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 arch/x86/pic.o
+ .group         0x0000000000000000        0x8 kernel/elf.o
+ .group         0x0000000000000000        0x8 kernel/elf.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/elf.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/elf.o
+ .group         0x0000000000000000        0x8 kernel/dev.o
+ .group         0x0000000000000000        0x8 kernel/dev.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/dev.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/dev.o
+ .group         0x0000000000000000        0x8 ipc/message.o
+ .group         0x0000000000000000        0x8 ipc/message.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 ipc/message.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 ipc/message.o
+ .group         0x0000000000000000        0x8 kernel/vfs.o
+ .group         0x0000000000000000        0x8 kernel/vfs.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/vfs.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/vfs.o
+ .group         0x0000000000000000        0x8 kernel/initrd.o
+ .group         0x0000000000000000        0x8 kernel/initrd.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/initrd.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/initrd.o
+ .group         0x0000000000000000        0x8 kernel/module.o
+ .group         0x0000000000000000        0x8 kernel/module.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/module.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/module.o
+ .group         0x0000000000000000        0x8 kernel/kshell.o
+ .group         0x0000000000000000        0x8 kernel/kshell.o
+ .group         0x0000000000000000        0x8 kernel/kshell.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/kshell.o
+ .text.__x86.get_pc_thunk.dx
+                0x0000000000000000        0x4 kernel/kshell.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/kshell.o
+ .group         0x0000000000000000        0x8 kernel/rootfs.o
+ .group         0x0000000000000000        0x8 kernel/rootfs.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/rootfs.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/rootfs.o
+ .group         0x0000000000000000        0x8 kernel/terminal.o
+ .group         0x0000000000000000        0x8 kernel/terminal.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 kernel/terminal.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/terminal.o
+ .group         0x0000000000000000        0x8 lib/clist.o
+ .group         0x0000000000000000        0x8 lib/clist.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 lib/clist.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 lib/clist.o
+ .group         0x0000000000000000        0x8 kernel/arch.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 kernel/arch.o
+ .group         0x0000000000000000        0x8 module/atapi/atapi.o
+ .group         0x0000000000000000        0x8 module/atapi/atapi.o
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 module/atapi/atapi.o
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 module/atapi/atapi.o
+
+Конфігурація пам’яті
+
+Назва       Походження Довжина     Атрибути
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Скрипт компонування та карта пам’яті
+
+                0x0000000000100000                . = 0x100000
+                0x0000000000100000                kernel_start = .
+
+.text           0x0000000000100000     0xb42e
+ *(.multiboot)
+ .multiboot     0x0000000000100000       0x30 arch/x86/boot.o
+ *(.text*)
+ .text          0x0000000000100030       0x13 arch/x86/boot.o
+                0x0000000000100030                _start
+ .text          0x0000000000100043      0x7ad arch/x86/terminal.o
+                0x0000000000100043                terminal_initialize
+                0x0000000000100118                scroll
+                0x00000000001001cd                putc
+                0x0000000000100345                terminal_clear
+                0x0000000000100398                terminal_setcolor
+                0x00000000001003b1                terminal_setbackground
+                0x00000000001003ca                terminal_getX
+                0x00000000001003e5                terminal_getY
+                0x0000000000100400                terminal_getBufferAddress
+                0x0000000000100415                terminal_enableReplay
+                0x000000000010042e                putchar
+                0x000000000010049a                psf_init
+                0x00000000001006a1                terminal_clearWithColor
+                0x00000000001006bf                terminal_printCursor
+                0x0000000000100710                terminal_writeXY
+                0x00000000001007d2                terminal_getBufferSize
+ .text.__x86.get_pc_thunk.ax
+                0x00000000001007f0        0x4 arch/x86/terminal.o
+                0x00000000001007f0                __x86.get_pc_thunk.ax
+ .text.__x86.get_pc_thunk.dx
+                0x00000000001007f4        0x4 arch/x86/terminal.o
+                0x00000000001007f4                __x86.get_pc_thunk.dx
+ .text.__x86.get_pc_thunk.cx
+                0x00000000001007f8        0x4 arch/x86/terminal.o
+                0x00000000001007f8                __x86.get_pc_thunk.cx
+ .text.__x86.get_pc_thunk.bx
+                0x00000000001007fc        0x4 arch/x86/terminal.o
+                0x00000000001007fc                __x86.get_pc_thunk.bx
+ .text          0x0000000000100800      0x59b kernel/kernel.o
+                0x0000000000100800                parse_commandLine
+                0x0000000000100875                kernel_main
+                0x0000000000100c4c                exec_init
+ .text          0x0000000000100d9b       0x7e arch/x86/io.o
+                0x0000000000100d9b                io_writePort
+                0x0000000000100db2                io_readPort
+                0x0000000000100dd2                io_writePortW
+                0x0000000000100df6                io_readPortW
+ .text          0x0000000000100e19      0x409 arch/x86/serial.o
+                0x0000000000100e4a                init_serial
+                0x0000000000100f40                serial_received
+                0x0000000000100f72                read_serial
+                0x0000000000100fa5                is_transmit_empty
+                0x0000000000100fd7                write_serial
+                0x0000000000101016                write_serialString
+                0x0000000000101067                write_serialHex
+                0x000000000010113b                write_serialInt
+ .text          0x0000000000101222      0x515 arch/x86/arch.o
+                0x0000000000101222                arch_init
+                0x0000000000101282                arch_reset
+                0x00000000001012cf                panic
+                0x0000000000101319                gpf_exc
+                0x000000000010136c                arch_disableIRQ
+                0x0000000000101431                arch_enableIRQ
+                0x000000000010146c                arch_buildStack
+                0x0000000000101549                arch_disableInterrupts
+                0x000000000010155a                arch_enableInterrupts
+                0x000000000010156b                arch_poweroff
+                0x00000000001015d5                arch_copy_process_args
+                0x00000000001015e5                arch_destroyStack
+                0x0000000000101628                x86_userSwitch
+                0x000000000010171e                arch_set_active_thread
+ .text          0x0000000000101737      0x260 arch/x86/gdt.o
+                0x0000000000101737                gdt_init
+                0x000000000010180f                gdt_set_gate
+                0x00000000001018b2                tss_write
+                0x0000000000101960                tss_set_stack
+                0x0000000000101982                tss_getTSS
+ *fill*         0x0000000000101997        0x9 
+ .text          0x00000000001019a0       0x88 arch/x86/gdtfl.o
+                0x00000000001019a0                gdt_flush
+                0x00000000001019bb                tss_flush
+                0x00000000001019c3                arch_jumpToUser
+                0x00000000001019e1                x86_user_exit
+                0x0000000000101a00                arch_switchContext
+                0x0000000000101a1d                x86_switchStacks
+ .text          0x0000000000101a28      0x7fc arch/x86/interrupts.o
+                0x0000000000101a28                init_idt
+                0x0000000000101fdb                idt_set_gate
+                0x000000000010206c                isr_handler
+                0x000000000010211d                irq_handler
+                0x00000000001021dc                interrupts_addHandler
+                0x000000000010220a                interrupts_init
+ *fill*         0x0000000000102224        0xc 
+ .text          0x0000000000102230      0x1e9 arch/x86/interruptsasm.o
+                0x0000000000102230                isr0
+                0x000000000010223a                isr1
+                0x0000000000102244                isr2
+                0x000000000010224e                isr3
+                0x0000000000102258                isr4
+                0x0000000000102262                isr5
+                0x000000000010226c                isr6
+                0x0000000000102276                isr7
+                0x0000000000102280                isr8
+                0x000000000010228a                isr9
+                0x0000000000102294                isr10
+                0x000000000010229e                isr11
+                0x00000000001022a8                isr12
+                0x00000000001022b2                isr13
+                0x00000000001022b9                isr14
+                0x00000000001022c0                isr15
+                0x00000000001022c7                isr16
+                0x00000000001022ce                isr17
+                0x00000000001022d5                isr18
+                0x00000000001022dc                isr19
+                0x00000000001022e3                isr20
+                0x00000000001022ea                isr21
+                0x00000000001022f1                isr22
+                0x00000000001022f8                isr23
+                0x00000000001022ff                isr24
+                0x0000000000102306                isr25
+                0x000000000010230d                isr26
+                0x0000000000102314                isr27
+                0x000000000010231b                isr28
+                0x0000000000102322                isr29
+                0x0000000000102329                isr30
+                0x0000000000102330                isr31
+                0x000000000010236d                irq0
+                0x0000000000102373                irq1
+                0x0000000000102379                irq2
+                0x000000000010237f                irq3
+                0x0000000000102385                irq4
+                0x000000000010238b                irq5
+                0x0000000000102391                irq6
+                0x0000000000102397                irq7
+                0x000000000010239d                irq8
+                0x00000000001023a3                irq9
+                0x00000000001023a9                irq10
+                0x00000000001023af                irq11
+                0x00000000001023b5                irq12
+                0x00000000001023bb                irq13
+                0x00000000001023c1                irq14
+                0x00000000001023c7                irq15
+                0x00000000001023ee                irq_handler_exit
+                0x0000000000102402                idt_flush
+                0x000000000010240a                syscall_irq
+                0x0000000000102413                scheduler_irq
+ .text          0x0000000000102419       0x3c mm/mm.o
+                0x0000000000102419                memset
+ .text          0x0000000000102455      0x602 mm/pmm.o
+                0x0000000000102455                mmap_set
+                0x0000000000102491                mmap_test
+                0x00000000001024c2                pmml_firstFree
+                0x000000000010250d                pmml_firstFree_size
+                0x0000000000102584                ppml_init
+                0x0000000000102664                pmml_alloc
+                0x0000000000102768                pmml_free
+                0x00000000001027e2                pmml_getMemorySize
+                0x00000000001027fa                pmml_getMaxBlocks
+                0x000000000010280f                pmml_allocPages
+                0x000000000010293c                pmml_freePages
+                0x000000000010299d                pmml_initRegion
+                0x0000000000102a01                pmml_getFreeBlocks
+                0x0000000000102a20                pmml_isPageAllocated
+ .text          0x0000000000102a57      0x76c arch/x86/vmm.o
+                0x0000000000102a57                vmm_init
+                0x0000000000102c0a                vmm_pfault
+                0x0000000000102d22                vmm_enable
+                0x0000000000102d4a                vmm_load
+                0x0000000000102d63                vmm_map
+                0x0000000000102d92                vmm_dump
+                0x0000000000102e88                vmm_switch
+                0x0000000000102ebc                vmm_allocTable
+                0x0000000000102f49                vmm_getCurrentDirectory
+                0x0000000000102f5e                vmm_createDirectory
+                0x00000000001030b9                vmm_translate
+ .text          0x00000000001031c3      0x322 kernel/mstring.o
+                0x00000000001031f4                memcpy
+                0x0000000000103231                strcmp
+                0x00000000001032c2                strcpy
+                0x00000000001032fb                strchr
+                0x0000000000103337                strtok
+                0x00000000001033f1                strdup
+                0x000000000010345e                isdigit
+                0x0000000000103490                atoi
+ .text          0x00000000001034e5      0xd44 kernel/process.o
+                0x00000000001034e5                idle_task
+                0x00000000001034ff                process_allocateProcess
+                0x00000000001035d5                process_create
+                0x0000000000103770                process_init
+                0x0000000000103826                process_dump
+                0x0000000000103972                process_yield
+                0x00000000001039ad                process_schedule
+                0x0000000000103b9a                process_getCurrentPID
+                0x0000000000103bc3                process_exit
+                0x0000000000103c46                process_kill
+                0x0000000000103c6b                process_getProcess
+                0x0000000000103c8d                process_update
+                0x0000000000103c9d                process_block
+                0x0000000000103cdf                process_unblock
+                0x0000000000103d09                process_wait
+                0x0000000000103dc1                process_waitPid
+                0x0000000000103e48                process_findByStatus
+                0x0000000000103e94                process_findNextByStatus
+                0x0000000000103ee1                process_findID
+                0x0000000000103f2d                process_findDispatcher
+                0x0000000000103f69                process_findIdDispatcher
+                0x0000000000103fa5                __process_destroy
+                0x0000000000104147                process_getProcesses
+                0x000000000010415c                process_dumpAll
+                0x00000000001041e0                process_disableScheduler
+                0x00000000001041fa                process_enableScheduler
+                0x0000000000104214                process_getNextPID
+ .text          0x0000000000104229      0x9aa kernel/syscall.o
+                0x000000000010425a                syscall_handler
+                0x00000000001042f0                sys_print
+                0x0000000000104342                sys_exit
+                0x0000000000104378                sys_kill
+                0x00000000001043a5                sys_getpid
+                0x00000000001043c3                sys_sendto
+                0x0000000000104415                sys_recev
+                0x000000000010446c                sys_open
+                0x00000000001044c7                sys_close
+                0x00000000001044f5                sys_read
+                0x000000000010452a                sys_write
+                0x000000000010455f                sys_alloc
+                0x0000000000104589                sys_free
+                0x00000000001045e2                sys_exec
+                0x00000000001046f1                sys_reboot
+                0x0000000000104714                sys_poweroff
+                0x0000000000104737                sys_chdir
+                0x00000000001047d0                sys_pwd
+                0x0000000000104816                sys_opendir
+                0x0000000000104840                sys_closedir
+                0x0000000000104854                sys_readdir
+                0x0000000000104893                sys_exec_shell
+                0x00000000001049c2                sys_waitpid
+                0x0000000000104a3e                sys_getppid
+                0x0000000000104a90                sys_sysinfo
+                0x0000000000104b12                copy_from_user
+                0x0000000000104b6b                sys_getuid
+                0x0000000000104b9b                sys_setuid
+ .text          0x0000000000104bd3      0x51d kernel/keyboard.o
+                0x0000000000104bd3                keyboard_init
+                0x0000000000104c6b                keyboard_handler
+                0x0000000000105075                keyboard_get
+                0x000000000010509f                keyboard_keyHandler
+ .text          0x00000000001050f0      0x35c arch/x86/pic.o
+                0x00000000001050f0                pic_init
+                0x0000000000105206                pic_enable
+                0x00000000001052ef                pic_disable
+                0x00000000001053c7                pic_acknowledge
+ .text          0x000000000010544c      0x3cf kernel/elf.o
+                0x000000000010544c                elf_check_file
+                0x0000000000105524                elf_load_file
+ .text          0x000000000010581b      0x14b kernel/dev.o
+                0x000000000010581b                dev_init
+                0x0000000000105879                dev_add
+                0x0000000000105901                dev_find
+                0x0000000000105956                dev_remove
+ .text          0x0000000000105966      0x19a ipc/message.o
+                0x0000000000105997                msg_send
+                0x0000000000105a56                msg_receive
+ .text          0x0000000000105b00      0x6e4 kernel/vfs.o
+                0x0000000000105b31                vfs_init
+                0x0000000000105b41                vfs_addFS
+                0x0000000000105b91                vfs_read
+                0x0000000000105c0f                vfs_write
+                0x0000000000105c8d                vfs_open
+                0x0000000000105cde                vfs_close
+                0x0000000000105d2d                vfs_readdir
+                0x0000000000105d62                vfs_finddir
+                0x0000000000105d9d                vfs_getRoot
+                0x0000000000105db2                vfs_mount
+                0x0000000000105e36                vfs_creat
+                0x0000000000105e90                vfs_truncate
+                0x0000000000105ec9                vfs_find
+                0x0000000000105f6c                vfs_readBlock
+                0x0000000000105faa                vfs_writeBlock
+                0x0000000000105fe8                vfs_ioctl
+                0x0000000000106026                vfs_find_impl
+                0x00000000001060a0                vfs_node_path
+                0x000000000010618f                vfs_findFS
+ .text          0x00000000001061e4      0x5d3 kernel/initrd.o
+                0x0000000000106215                initrd_init
+                0x000000000010650b                initrd_read
+                0x0000000000106598                initrd_getFS
+                0x00000000001065ac                initrd_readdir
+                0x00000000001066ae                initrd_finddir
+                0x000000000010675e                initrd_getRoot
+                0x0000000000106773                initrd_mount
+ .text          0x00000000001067b7      0x45d kernel/module.o
+                0x00000000001067b7                load_module
+                0x0000000000106894                module_resolve_name
+                0x00000000001069b3                module_resolve_dep
+                0x0000000000106a84                module_load_seg
+                0x0000000000106bec                module_resolve_symbols
+                0x0000000000106c00                module_reloc_symbols
+ .text          0x0000000000106c14      0xbbd kernel/kshell.o
+                0x0000000000106c45                syscall
+                0x0000000000106c81                kshell_init
+                0x0000000000106d10                getInput
+                0x0000000000106d3e                kshell_main
+                0x0000000000106e73                parseCommand
+ .text          0x00000000001077d1      0x463 kernel/rootfs.o
+                0x0000000000107802                rootfs_init
+                0x00000000001078f9                rootfs_read
+                0x0000000000107947                rootfs_readdir
+                0x00000000001079d6                rootfs_finddir
+                0x0000000000107a2b                rootfs_creat
+                0x0000000000107b65                rootfs_mount
+                0x0000000000107b95                rootfs_write
+                0x0000000000107c0b                rootfs_truncate
+                0x0000000000107c24                rootfs_close
+ .text          0x0000000000107c34      0x4e7 kernel/terminal.o
+                0x0000000000107c34                printf_syscall
+                0x0000000000107c60                printf
+                0x0000000000107dc6                tty_write
+                0x0000000000107de9                tty_read
+                0x0000000000107e81                tty_init
+                0x0000000000107ef9                terminal_writestring
+                0x0000000000107f4b                terminal_writeInt
+                0x0000000000108032                terminal_writeHex
+ .text          0x000000000010811b      0x63c lib/clist.o
+                0x000000000010811b                clist_insert_entry_after
+                0x00000000001081cd                clist_insert_entry_before
+                0x0000000000108275                clist_delete_entry
+                0x00000000001082e9                clist_find
+                0x0000000000108350                clist_find_next
+                0x00000000001083d3                clist_for_each
+                0x000000000010842d                clist_dump
+                0x00000000001084a5                clist_test
+ .text          0x0000000000108757       0x58 kernel/arch.o
+                0x0000000000108757                kassert
+ .text          0x00000000001087af      0x7f9 module/atapi/atapi.o
+                0x00000000001087af                ata_io_wait
+                0x0000000000108835                ata_status_wait
+                0x00000000001088d1                ata_wait
+                0x0000000000108976                ata_soft_reset
+                0x00000000001089d0                ata_max_offset
+                0x0000000000108a2d                ata_device_init
+                0x0000000000108bcb                ata_device_detect
+                0x0000000000108d8a                ata_vdev_read
+                0x0000000000108db7                ata_vdev_write
+                0x0000000000108de4                ata_create_device
+                0x0000000000108ec8                atapi_init
+ *(.rodata)
+ .rodata        0x0000000000108fa8     0x11c4 kernel/kernel.o
+ .rodata        0x000000000010a16c        0x5 arch/x86/serial.o
+ *fill*         0x000000000010a171        0x3 
+ .rodata        0x000000000010a174       0x48 arch/x86/arch.o
+ .rodata        0x000000000010a1bc      0x158 arch/x86/interrupts.o
+ .rodata        0x000000000010a314       0xc4 mm/pmm.o
+ .rodata        0x000000000010a3d8      0x1be arch/x86/vmm.o
+ *fill*         0x000000000010a596        0x2 
+ .rodata        0x000000000010a598      0x309 kernel/process.o
+ *fill*         0x000000000010a8a1        0x3 
+ .rodata        0x000000000010a8a4      0x17a kernel/syscall.o
+ *fill*         0x000000000010aa1e        0x2 
+ .rodata        0x000000000010aa20      0x103 kernel/keyboard.o
+ *fill*         0x000000000010ab23        0x1 
+ .rodata        0x000000000010ab24      0x11e kernel/elf.o
+ .rodata        0x000000000010ac42        0xc kernel/dev.o
+ .rodata        0x000000000010ac4e       0x1c ipc/message.o
+ *fill*         0x000000000010ac6a        0x2 
+ .rodata        0x000000000010ac6c      0x1ba kernel/vfs.o
+ .rodata        0x000000000010ae26       0x3a kernel/initrd.o
+ .rodata        0x000000000010ae60       0x89 kernel/module.o
+ *fill*         0x000000000010aee9        0x3 
+ .rodata        0x000000000010aeec      0x29d kernel/kshell.o
+ .rodata        0x000000000010b189        0x9 kernel/rootfs.o
+ *fill*         0x000000000010b192        0x2 
+ .rodata        0x000000000010b194       0x4b kernel/terminal.o
+ *fill*         0x000000000010b1df        0x1 
+ .rodata        0x000000000010b1e0       0x47 lib/clist.o
+ *fill*         0x000000000010b227        0x1 
+ .rodata        0x000000000010b228       0x38 kernel/arch.o
+ .rodata        0x000000000010b260      0x1ce module/atapi/atapi.o
+
+.eh_frame       0x000000000010b430     0x2360
+ .eh_frame      0x000000000010b430      0x2a8 arch/x86/terminal.o
+ .eh_frame      0x000000000010b6d8       0x7c kernel/kernel.o
+                                         0xa8 (розмір до впорядкування)
+ .eh_frame      0x000000000010b754       0x80 arch/x86/io.o
+                                         0xac (розмір до впорядкування)
+ .eh_frame      0x000000000010b7d4      0x144 arch/x86/serial.o
+                                        0x184 (розмір до впорядкування)
+ .eh_frame      0x000000000010b918      0x1e4 arch/x86/arch.o
+                                        0x224 (розмір до впорядкування)
+ .eh_frame      0x000000000010bafc       0xb4 arch/x86/gdt.o
+                                         0xf4 (розмір до впорядкування)
+ .eh_frame      0x000000000010bbb0       0xdc arch/x86/interrupts.o
+                                        0x130 (розмір до впорядкування)
+ .eh_frame      0x000000000010bc8c       0x20 mm/mm.o
+                                         0x4c (розмір до впорядкування)
+ .eh_frame      0x000000000010bcac      0x200 mm/pmm.o
+                                        0x240 (розмір до впорядкування)
+ .eh_frame      0x000000000010beac      0x184 arch/x86/vmm.o
+                                        0x1c4 (розмір до впорядкування)
+ .eh_frame      0x000000000010c030      0x138 kernel/mstring.o
+                                        0x178 (розмір до впорядкування)
+ .eh_frame      0x000000000010c168      0x3c8 kernel/process.o
+                                        0x408 (розмір до впорядкування)
+ .eh_frame      0x000000000010c530      0x448 kernel/syscall.o
+                                        0x488 (розмір до впорядкування)
+ .eh_frame      0x000000000010c978       0x98 kernel/keyboard.o
+                                         0xd8 (розмір до впорядкування)
+ .eh_frame      0x000000000010ca10       0xa0 arch/x86/pic.o
+                                         0xcc (розмір до впорядкування)
+ .eh_frame      0x000000000010cab0       0x50 kernel/elf.o
+                                         0x90 (розмір до впорядкування)
+ .eh_frame      0x000000000010cb00       0x98 kernel/dev.o
+                                         0xd8 (розмір до впорядкування)
+ .eh_frame      0x000000000010cb98       0x78 ipc/message.o
+                                         0xb8 (розмір до впорядкування)
+ .eh_frame      0x000000000010cc10      0x2d4 kernel/vfs.o
+                                        0x314 (розмір до впорядкування)
+ .eh_frame      0x000000000010cee4      0x130 kernel/initrd.o
+                                        0x170 (розмір до впорядкування)
+ .eh_frame      0x000000000010d014       0xe0 kernel/module.o
+                                        0x120 (розмір до впорядкування)
+ .eh_frame      0x000000000010d0f4       0xe8 kernel/kshell.o
+                                        0x13c (розмір до впорядкування)
+ .eh_frame      0x000000000010d1dc      0x178 kernel/rootfs.o
+                                        0x1b8 (розмір до впорядкування)
+ .eh_frame      0x000000000010d354      0x130 kernel/terminal.o
+                                        0x170 (розмір до впорядкування)
+ .eh_frame      0x000000000010d484      0x134 lib/clist.o
+                                        0x174 (розмір до впорядкування)
+ .eh_frame      0x000000000010d5b8       0x28 kernel/arch.o
+                                         0x54 (розмір до впорядкування)
+ .eh_frame      0x000000000010d5e0      0x1b0 module/atapi/atapi.o
+                                        0x1f0 (розмір до впорядкування)
+
+.iplt           0x000000000010d790        0x0
+ .iplt          0x000000000010d790        0x0 arch/x86/boot.o
+
+.rel.dyn        0x000000000010d790        0x0
+ .rel.got       0x000000000010d790        0x0 arch/x86/boot.o
+ .rel.iplt      0x000000000010d790        0x0 arch/x86/boot.o
+ .rel.text      0x000000000010d790        0x0 arch/x86/boot.o
+
+.data           0x000000000010d7a0     0x89a6
+ *(.data)
+ .data          0x000000000010d7a0        0x0 arch/x86/boot.o
+ .data          0x000000000010d7a0        0x0 arch/x86/terminal.o
+ .data          0x000000000010d7a0        0x4 kernel/kernel.o
+                0x000000000010d7a0                ksymbols_count
+ .data          0x000000000010d7a4        0x0 arch/x86/io.o
+ .data          0x000000000010d7a4        0x0 arch/x86/serial.o
+ .data          0x000000000010d7a4        0x0 arch/x86/arch.o
+ .data          0x000000000010d7a4        0x0 arch/x86/gdt.o
+ .data          0x000000000010d7a4        0x0 arch/x86/interrupts.o
+ .data          0x000000000010d7a4        0x0 mm/mm.o
+ .data          0x000000000010d7a4        0x0 mm/pmm.o
+ .data          0x000000000010d7a4        0x0 arch/x86/vmm.o
+ .data          0x000000000010d7a4        0x0 kernel/mstring.o
+ .data          0x000000000010d7a4        0x0 kernel/process.o
+ .data          0x000000000010d7a4        0x0 kernel/syscall.o
+ .data          0x000000000010d7a4        0x0 kernel/keyboard.o
+ .data          0x000000000010d7a4        0x4 arch/x86/pic.o
+ .data          0x000000000010d7a8        0x0 kernel/elf.o
+ .data          0x000000000010d7a8     0x8020 font.o
+                0x000000000010d7a8                _binary_font_psf_start
+                0x00000000001157c8                _binary_font_psf_end
+ .data          0x00000000001157c8        0x0 kernel/dev.o
+ .data          0x00000000001157c8        0x0 ipc/message.o
+ .data          0x00000000001157c8        0x0 kernel/vfs.o
+ .data          0x00000000001157c8        0x0 kernel/initrd.o
+ .data          0x00000000001157c8        0x0 kernel/module.o
+ .data          0x00000000001157c8        0x0 kernel/kshell.o
+ .data          0x00000000001157c8        0x0 kernel/rootfs.o
+ .data          0x00000000001157c8        0x0 kernel/terminal.o
+ .data          0x00000000001157c8        0x0 lib/clist.o
+ .data          0x00000000001157c8        0x0 kernel/arch.o
+ *fill*         0x00000000001157c8       0x18 
+ .data          0x00000000001157e0      0x966 module/atapi/atapi.o
+                0x00000000001157e0                ata_primary_master
+                0x0000000000115a40                ata_primary_slave
+                0x0000000000115ca0                ata_secondary_master
+                0x0000000000115f00                ata_secondary_slave
+                0x0000000000116144                ata_start_char
+                0x0000000000116145                ata_cdrom_char
+                0x0000000000116146                kernel_symbols_start = .
+ *(.symtab)
+                0x0000000000116146                kernel_symbols_end = .
+
+.got            0x0000000000116148        0x0
+ .got           0x0000000000116148        0x0 arch/x86/boot.o
+
+.got.plt        0x0000000000116148        0xc
+ .got.plt       0x0000000000116148        0xc arch/x86/boot.o
+                0x0000000000116148                _GLOBAL_OFFSET_TABLE_
+
+.igot.plt       0x0000000000116154        0x0
+ .igot.plt      0x0000000000116154        0x0 arch/x86/boot.o
+
+.data.rel.local
+                0x0000000000116160      0xc2c
+ .data.rel.local
+                0x0000000000116160      0xb60 kernel/kernel.o
+                0x0000000000116160                ksymbols
+ .data.rel.local
+                0x0000000000116cc0       0x44 arch/x86/interrupts.o
+ *fill*         0x0000000000116d04       0x1c 
+ .data.rel.local
+                0x0000000000116d20       0x6c kernel/syscall.o
+
+.bss            0x0000000000117000     0x9290
+ *(.bss)
+ .bss           0x0000000000117000     0x4000 arch/x86/boot.o
+ .bss           0x000000000011b000       0x38 arch/x86/terminal.o
+                0x000000000011b000                cursor_x
+                0x000000000011b002                cursor_y
+                0x000000000011b004                initialized
+                0x000000000011b008                vgaFramebuffer
+                0x000000000011b00c                vgaW
+                0x000000000011b010                vgaH
+                0x000000000011b014                vgaP
+                0x000000000011b018                unicode
+                0x000000000011b01c                replay
+                0x000000000011b020                vgaBack
+                0x000000000011b024                vgaFr
+                0x000000000011b028                vgaBpp
+                0x000000000011b02c                ws_row
+                0x000000000011b030                ws_col
+                0x000000000011b034                video_memory
+ .bss           0x000000000011b038        0xc kernel/kernel.o
+                0x000000000011b038                verbose
+                0x000000000011b03c                disableStartInit
+                0x000000000011b040                _multiboot
+ .bss           0x000000000011b044        0x0 arch/x86/io.o
+ .bss           0x000000000011b044        0x0 arch/x86/serial.o
+ .bss           0x000000000011b044        0x4 arch/x86/arch.o
+                0x000000000011b044                __active
+ *fill*         0x000000000011b048       0x18 
+ .bss           0x000000000011b060       0xa8 arch/x86/gdt.o
+                0x000000000011b060                gdt_entries
+                0x000000000011b090                gdt_ptr
+                0x000000000011b0a0                tss_entry
+ *fill*         0x000000000011b108       0x18 
+ .bss           0x000000000011b120      0xa20 arch/x86/interrupts.o
+                0x000000000011b120                idt_entries
+                0x000000000011b920                idt_ptr
+                0x000000000011b940                interrupt_handlers
+ .bss           0x000000000011bb40        0x0 mm/mm.o
+ .bss           0x000000000011bb40       0x14 mm/pmm.o
+                0x000000000011bb40                main_memory_size
+                0x000000000011bb44                bitmap
+                0x000000000011bb48                max_blocks
+                0x000000000011bb4c                free_blocks
+                0x000000000011bb50                used_blocks
+ *fill*         0x000000000011bb54      0x4ac 
+ .bss           0x000000000011c000     0x4004 arch/x86/vmm.o
+                0x000000000011c000                kdirectory
+                0x000000000011d000                kpage_table
+                0x000000000011e000                pdir_3gb
+                0x000000000011f000                table
+                0x0000000000120000                current_dir
+ .bss           0x0000000000120004        0x4 kernel/mstring.o
+ .bss           0x0000000000120008       0x20 kernel/process.o
+                0x0000000000120008                cPid
+                0x000000000012000c                curTasks
+                0x0000000000120010                clocks
+                0x0000000000120014                fswitch
+                0x0000000000120018                runningTask
+                0x000000000012001c                task_list
+                0x0000000000120020                idle
+                0x0000000000120024                disableScheduler
+ .bss           0x0000000000120028        0x0 kernel/syscall.o
+ .bss           0x0000000000120028       0x14 kernel/keyboard.o
+                0x0000000000120028                hasKey
+                0x000000000012002c                keyCode
+                0x0000000000120030                shift
+                0x0000000000120034                caps
+                0x0000000000120038                ctrl
+ .bss           0x000000000012003c        0x0 arch/x86/pic.o
+ .bss           0x000000000012003c        0x0 kernel/elf.o
+ .bss           0x000000000012003c        0x8 kernel/dev.o
+                0x000000000012003c                device
+                0x0000000000120040                dev_dir
+ .bss           0x0000000000120044        0x0 ipc/message.o
+ .bss           0x0000000000120044        0x8 kernel/vfs.o
+                0x0000000000120044                fs_start
+                0x0000000000120048                fs_root
+ *fill*         0x000000000012004c       0x14 
+ .bss           0x0000000000120060       0xa4 kernel/initrd.o
+                0x0000000000120060                header
+                0x0000000000120064                file_headers
+                0x0000000000120068                initrd_root
+                0x000000000012006c                initrd_dev
+                0x0000000000120070                initrd_nodes
+                0x0000000000120080                dirent
+ .bss           0x0000000000120104        0x0 kernel/module.o
+ *fill*         0x0000000000120104       0x1c 
+ .bss           0x0000000000120120       0xa8 kernel/kshell.o
+                0x0000000000120120                info
+                0x0000000000120124                kshell_tty
+                0x0000000000120128                pid
+                0x0000000000120140                path
+                0x00000000001201c0                exit
+ *fill*         0x00000000001201c8       0x18 
+ .bss           0x00000000001201e0       0xac kernel/rootfs.o
+                0x00000000001201e0                root
+                0x00000000001201e4                rootfs_fs
+                0x0000000000120200                rootfs_dirent
+                0x0000000000120284                files
+                0x0000000000120288                data
+ .bss           0x000000000012028c        0x4 kernel/terminal.o
+                0x000000000012028c                tty
+ .bss           0x0000000000120290        0x0 lib/clist.o
+ .bss           0x0000000000120290        0x0 kernel/arch.o
+ .bss           0x0000000000120290        0x0 module/atapi/atapi.o
+                0x0000000000120290                kernel_end = .
+LOAD arch/x86/boot.o
+LOAD arch/x86/terminal.o
+LOAD kernel/kernel.o
+LOAD arch/x86/io.o
+LOAD arch/x86/serial.o
+LOAD arch/x86/arch.o
+LOAD arch/x86/gdt.o
+LOAD arch/x86/gdtfl.o
+LOAD arch/x86/interrupts.o
+LOAD arch/x86/interruptsasm.o
+LOAD mm/mm.o
+LOAD mm/pmm.o
+LOAD arch/x86/vmm.o
+LOAD kernel/mstring.o
+LOAD kernel/process.o
+LOAD kernel/syscall.o
+LOAD kernel/keyboard.o
+LOAD arch/x86/pic.o
+LOAD kernel/elf.o
+LOAD font.o
+LOAD kernel/dev.o
+LOAD ipc/message.o
+LOAD kernel/vfs.o
+LOAD kernel/initrd.o
+LOAD kernel/module.o
+LOAD kernel/kshell.o
+LOAD kernel/rootfs.o
+LOAD kernel/terminal.o
+LOAD lib/clist.o
+LOAD kernel/arch.o
+LOAD module/atapi/atapi.o
+OUTPUT(kernel.bin elf32-i386)
+
+.debug_line     0x0000000000000000     0x3dae
+ .debug_line    0x0000000000000000       0x44 arch/x86/boot.o
+ .debug_line    0x0000000000000044      0x321 arch/x86/terminal.o
+ .debug_line    0x0000000000000365      0x23e kernel/kernel.o
+ .debug_line    0x00000000000005a3       0x77 arch/x86/io.o
+ .debug_line    0x000000000000061a      0x1c8 arch/x86/serial.o
+ .debug_line    0x00000000000007e2      0x1e8 arch/x86/arch.o
+ .debug_line    0x00000000000009ca       0xef arch/x86/gdt.o
+ .debug_line    0x0000000000000ab9       0x7c arch/x86/gdtfl.o
+ .debug_line    0x0000000000000b35      0x1cd arch/x86/interrupts.o
+ .debug_line    0x0000000000000d02      0x156 arch/x86/interruptsasm.o
+ .debug_line    0x0000000000000e58       0x60 mm/mm.o
+ .debug_line    0x0000000000000eb8      0x2ce mm/pmm.o
+ .debug_line    0x0000000000001186      0x3a3 arch/x86/vmm.o
+ .debug_line    0x0000000000001529      0x1fc kernel/mstring.o
+ .debug_line    0x0000000000001725      0x540 kernel/process.o
+ .debug_line    0x0000000000001c65      0x397 kernel/syscall.o
+ .debug_line    0x0000000000001ffc      0x206 kernel/keyboard.o
+ .debug_line    0x0000000000002202      0x147 arch/x86/pic.o
+ .debug_line    0x0000000000002349      0x233 kernel/elf.o
+ .debug_line    0x000000000000257c       0xd0 kernel/dev.o
+ .debug_line    0x000000000000264c       0xff ipc/message.o
+ .debug_line    0x000000000000274b      0x315 kernel/vfs.o
+ .debug_line    0x0000000000002a60      0x2d4 kernel/initrd.o
+ .debug_line    0x0000000000002d34      0x235 kernel/module.o
+ .debug_line    0x0000000000002f69      0x3bc kernel/kshell.o
+ .debug_line    0x0000000000003325      0x1ed kernel/rootfs.o
+ .debug_line    0x0000000000003512      0x271 kernel/terminal.o
+ .debug_line    0x0000000000003783      0x262 lib/clist.o
+ .debug_line    0x00000000000039e5       0x5c kernel/arch.o
+ .debug_line    0x0000000000003a41      0x36d module/atapi/atapi.o
+
+.debug_info     0x0000000000000000     0xb092
+ .debug_info    0x0000000000000000       0x26 arch/x86/boot.o
+ .debug_info    0x0000000000000026      0x8cd arch/x86/terminal.o
+ .debug_info    0x00000000000008f3      0xa3e kernel/kernel.o
+ .debug_info    0x0000000000001331      0x15a arch/x86/io.o
+ .debug_info    0x000000000000148b      0x252 arch/x86/serial.o
+ .debug_info    0x00000000000016dd      0xb9f arch/x86/arch.o
+ .debug_info    0x000000000000227c      0x409 arch/x86/gdt.o
+ .debug_info    0x0000000000002685       0x44 arch/x86/gdtfl.o
+ .debug_info    0x00000000000026c9      0x815 arch/x86/interrupts.o
+ .debug_info    0x0000000000002ede       0x4c arch/x86/interruptsasm.o
+ .debug_info    0x0000000000002f2a       0xbd mm/mm.o
+ .debug_info    0x0000000000002fe7      0x88c mm/pmm.o
+ .debug_info    0x0000000000003873      0x71d arch/x86/vmm.o
+ .debug_info    0x0000000000003f90      0x331 kernel/mstring.o
+ .debug_info    0x00000000000042c1      0xc90 kernel/process.o
+ .debug_info    0x0000000000004f51     0x125e kernel/syscall.o
+ .debug_info    0x00000000000061af      0x25a kernel/keyboard.o
+ .debug_info    0x0000000000006409      0x15f arch/x86/pic.o
+ .debug_info    0x0000000000006568      0x947 kernel/elf.o
+ .debug_info    0x0000000000006eaf      0x47d kernel/dev.o
+ .debug_info    0x000000000000732c      0x59b ipc/message.o
+ .debug_info    0x00000000000078c7      0x98c kernel/vfs.o
+ .debug_info    0x0000000000008253      0x619 kernel/initrd.o
+ .debug_info    0x000000000000886c      0x535 kernel/module.o
+ .debug_info    0x0000000000008da1      0xbf4 kernel/kshell.o
+ .debug_info    0x0000000000009995      0x63e kernel/rootfs.o
+ .debug_info    0x0000000000009fd3      0x3ad kernel/terminal.o
+ .debug_info    0x000000000000a380      0x4e6 lib/clist.o
+ .debug_info    0x000000000000a866      0x107 kernel/arch.o
+ .debug_info    0x000000000000a96d      0x725 module/atapi/atapi.o
+
+.debug_abbrev   0x0000000000000000     0x2abb
+ .debug_abbrev  0x0000000000000000       0x14 arch/x86/boot.o
+ .debug_abbrev  0x0000000000000014      0x235 arch/x86/terminal.o
+ .debug_abbrev  0x0000000000000249      0x203 kernel/kernel.o
+ .debug_abbrev  0x000000000000044c       0xaf arch/x86/io.o
+ .debug_abbrev  0x00000000000004fb       0xf6 arch/x86/serial.o
+ .debug_abbrev  0x00000000000005f1      0x225 arch/x86/arch.o
+ .debug_abbrev  0x0000000000000816      0x146 arch/x86/gdt.o
+ .debug_abbrev  0x000000000000095c       0x1b arch/x86/gdtfl.o
+ .debug_abbrev  0x0000000000000977      0x1b6 arch/x86/interrupts.o
+ .debug_abbrev  0x0000000000000b2d       0x1b arch/x86/interruptsasm.o
+ .debug_abbrev  0x0000000000000b48       0x8b mm/mm.o
+ .debug_abbrev  0x0000000000000bd3      0x20e mm/pmm.o
+ .debug_abbrev  0x0000000000000de1      0x22e arch/x86/vmm.o
+ .debug_abbrev  0x000000000000100f      0x130 kernel/mstring.o
+ .debug_abbrev  0x000000000000113f      0x31b kernel/process.o
+ .debug_abbrev  0x000000000000145a      0x18d kernel/syscall.o
+ .debug_abbrev  0x00000000000015e7      0x125 kernel/keyboard.o
+ .debug_abbrev  0x000000000000170c       0xb4 arch/x86/pic.o
+ .debug_abbrev  0x00000000000017c0      0x18f kernel/elf.o
+ .debug_abbrev  0x000000000000194f      0x193 kernel/dev.o
+ .debug_abbrev  0x0000000000001ae2      0x151 ipc/message.o
+ .debug_abbrev  0x0000000000001c33      0x1f5 kernel/vfs.o
+ .debug_abbrev  0x0000000000001e28      0x1ba kernel/initrd.o
+ .debug_abbrev  0x0000000000001fe2      0x175 kernel/module.o
+ .debug_abbrev  0x0000000000002157      0x217 kernel/kshell.o
+ .debug_abbrev  0x000000000000236e      0x1ad kernel/rootfs.o
+ .debug_abbrev  0x000000000000251b      0x18a kernel/terminal.o
+ .debug_abbrev  0x00000000000026a5      0x196 lib/clist.o
+ .debug_abbrev  0x000000000000283b       0xc2 kernel/arch.o
+ .debug_abbrev  0x00000000000028fd      0x1be module/atapi/atapi.o
+
+.debug_aranges  0x0000000000000000      0x3c0
+ .debug_aranges
+                0x0000000000000000       0x20 arch/x86/boot.o
+ .debug_aranges
+                0x0000000000000020       0x20 arch/x86/terminal.o
+ .debug_aranges
+                0x0000000000000040       0x20 kernel/kernel.o
+ .debug_aranges
+                0x0000000000000060       0x20 arch/x86/io.o
+ .debug_aranges
+                0x0000000000000080       0x20 arch/x86/serial.o
+ .debug_aranges
+                0x00000000000000a0       0x20 arch/x86/arch.o
+ .debug_aranges
+                0x00000000000000c0       0x20 arch/x86/gdt.o
+ .debug_aranges
+                0x00000000000000e0       0x20 arch/x86/gdtfl.o
+ .debug_aranges
+                0x0000000000000100       0x20 arch/x86/interrupts.o
+ .debug_aranges
+                0x0000000000000120       0x20 arch/x86/interruptsasm.o
+ .debug_aranges
+                0x0000000000000140       0x20 mm/mm.o
+ .debug_aranges
+                0x0000000000000160       0x20 mm/pmm.o
+ .debug_aranges
+                0x0000000000000180       0x20 arch/x86/vmm.o
+ .debug_aranges
+                0x00000000000001a0       0x20 kernel/mstring.o
+ .debug_aranges
+                0x00000000000001c0       0x20 kernel/process.o
+ .debug_aranges
+                0x00000000000001e0       0x20 kernel/syscall.o
+ .debug_aranges
+                0x0000000000000200       0x20 kernel/keyboard.o
+ .debug_aranges
+                0x0000000000000220       0x20 arch/x86/pic.o
+ .debug_aranges
+                0x0000000000000240       0x20 kernel/elf.o
+ .debug_aranges
+                0x0000000000000260       0x20 kernel/dev.o
+ .debug_aranges
+                0x0000000000000280       0x20 ipc/message.o
+ .debug_aranges
+                0x00000000000002a0       0x20 kernel/vfs.o
+ .debug_aranges
+                0x00000000000002c0       0x20 kernel/initrd.o
+ .debug_aranges
+                0x00000000000002e0       0x20 kernel/module.o
+ .debug_aranges
+                0x0000000000000300       0x20 kernel/kshell.o
+ .debug_aranges
+                0x0000000000000320       0x20 kernel/rootfs.o
+ .debug_aranges
+                0x0000000000000340       0x20 kernel/terminal.o
+ .debug_aranges
+                0x0000000000000360       0x20 lib/clist.o
+ .debug_aranges
+                0x0000000000000380       0x20 kernel/arch.o
+ .debug_aranges
+                0x00000000000003a0       0x20 module/atapi/atapi.o
+
+.debug_str      0x0000000000000000     0x1fbc
+ .debug_str     0x0000000000000000       0x2e arch/x86/boot.o
+ .debug_str     0x000000000000002e      0x660 arch/x86/terminal.o
+                                        0x6e6 (розмір до впорядкування)
+ .debug_str     0x000000000000068e      0x1da kernel/kernel.o
+                                        0x6e8 (розмір до впорядкування)
+ .debug_str     0x0000000000000868       0x4e arch/x86/io.o
+                                        0x163 (розмір до впорядкування)
+ .debug_str     0x00000000000008b6       0xa3 arch/x86/serial.o
+                                        0x1a2 (розмір до впорядкування)
+ .debug_str     0x0000000000000959      0x186 arch/x86/arch.o
+                                        0x779 (розмір до впорядкування)
+ .debug_str     0x0000000000000adf      0x128 arch/x86/gdt.o
+                                        0x244 (розмір до впорядкування)
+ .debug_str     0x0000000000000c07       0xf5 arch/x86/interrupts.o
+                                        0x3bb (розмір до впорядкування)
+ .debug_str     0x0000000000000cfc       0x19 mm/mm.o
+                                        0x115 (розмір до впорядкування)
+ .debug_str     0x0000000000000d15      0x1a0 mm/pmm.o
+                                        0x662 (розмір до впорядкування)
+ .debug_str     0x0000000000000eb5      0x1b1 arch/x86/vmm.o
+                                        0x343 (розмір до впорядкування)
+ .debug_str     0x0000000000001066       0x72 kernel/mstring.o
+                                        0x1a6 (розмір до впорядкування)
+ .debug_str     0x00000000000010d8      0x2b0 kernel/process.o
+                                        0x5be (розмір до впорядкування)
+ .debug_str     0x0000000000001388      0x187 kernel/syscall.o
+                                        0x458 (розмір до впорядкування)
+ .debug_str     0x000000000000150f       0x71 kernel/keyboard.o
+                                        0x1c4 (розмір до впорядкування)
+ .debug_str     0x0000000000001580       0x60 arch/x86/pic.o
+                                        0x163 (розмір до впорядкування)
+ .debug_str     0x00000000000015e0      0x1c8 kernel/elf.o
+                                        0x497 (розмір до впорядкування)
+ .debug_str     0x00000000000017a8       0x4f kernel/dev.o
+                                        0x216 (розмір до впорядкування)
+ .debug_str     0x00000000000017f7       0x23 ipc/message.o
+                                        0x28e (розмір до впорядкування)
+ .debug_str     0x000000000000181a      0x12e kernel/vfs.o
+                                        0x357 (розмір до впорядкування)
+ .debug_str     0x0000000000001948       0xe0 kernel/initrd.o
+                                        0x2ff (розмір до впорядкування)
+ .debug_str     0x0000000000001a28       0xf6 kernel/module.o
+                                        0x32c (розмір до впорядкування)
+ .debug_str     0x0000000000001b1e       0x49 kernel/kshell.o
+                                        0x67e (розмір до впорядкування)
+ .debug_str     0x0000000000001b67       0xa9 kernel/rootfs.o
+                                        0x2b1 (розмір до впорядкування)
+ .debug_str     0x0000000000001c10       0x84 kernel/terminal.o
+                                        0x209 (розмір до впорядкування)
+ .debug_str     0x0000000000001c94       0xeb lib/clist.o
+                                        0x2a2 (розмір до впорядкування)
+ .debug_str     0x0000000000001d7f       0x1b kernel/arch.o
+                                        0x134 (розмір до впорядкування)
+ .debug_str     0x0000000000001d9a      0x222 module/atapi/atapi.o
+                                        0x3b6 (розмір до впорядкування)
+
+.comment        0x0000000000000000       0x27
+ .comment       0x0000000000000000       0x27 arch/x86/terminal.o
+                                         0x28 (розмір до впорядкування)
+ .comment       0x0000000000000027       0x28 kernel/kernel.o
+ .comment       0x0000000000000027       0x28 arch/x86/io.o
+ .comment       0x0000000000000027       0x28 arch/x86/serial.o
+ .comment       0x0000000000000027       0x28 arch/x86/arch.o
+ .comment       0x0000000000000027       0x28 arch/x86/gdt.o
+ .comment       0x0000000000000027       0x28 arch/x86/interrupts.o
+ .comment       0x0000000000000027       0x28 mm/mm.o
+ .comment       0x0000000000000027       0x28 mm/pmm.o
+ .comment       0x0000000000000027       0x28 arch/x86/vmm.o
+ .comment       0x0000000000000027       0x28 kernel/mstring.o
+ .comment       0x0000000000000027       0x28 kernel/process.o
+ .comment       0x0000000000000027       0x28 kernel/syscall.o
+ .comment       0x0000000000000027       0x28 kernel/keyboard.o
+ .comment       0x0000000000000027       0x28 arch/x86/pic.o
+ .comment       0x0000000000000027       0x28 kernel/elf.o
+ .comment       0x0000000000000027       0x28 kernel/dev.o
+ .comment       0x0000000000000027       0x28 ipc/message.o
+ .comment       0x0000000000000027       0x28 kernel/vfs.o
+ .comment       0x0000000000000027       0x28 kernel/initrd.o
+ .comment       0x0000000000000027       0x28 kernel/module.o
+ .comment       0x0000000000000027       0x28 kernel/kshell.o
+ .comment       0x0000000000000027       0x28 kernel/rootfs.o
+ .comment       0x0000000000000027       0x28 kernel/terminal.o
+ .comment       0x0000000000000027       0x28 lib/clist.o
+ .comment       0x0000000000000027       0x28 kernel/arch.o
+ .comment       0x0000000000000027       0x28 module/atapi/atapi.o
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/terminal.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/kernel.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/io.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/serial.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/arch.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/gdt.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/interrupts.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 mm/mm.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 mm/pmm.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/vmm.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/mstring.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/process.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/syscall.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/keyboard.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 arch/x86/pic.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/elf.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/dev.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 ipc/message.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/vfs.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/initrd.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/module.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/kshell.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/rootfs.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/terminal.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 lib/clist.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 kernel/arch.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 module/atapi/atapi.o
+
+.debug_pubnames
+                0x0000000000000000        0x0
+ .debug_pubnames
+                0x0000000000000000        0x0 arch/x86/gdtfl.o
+ .debug_pubnames
+                0x0000000000000000        0x0 arch/x86/interruptsasm.o
+
+.debug_frame    0x0000000000000000        0x0
+ .debug_frame   0x0000000000000000        0x0 arch/x86/gdtfl.o
+ .debug_frame   0x0000000000000000        0x0 arch/x86/interruptsasm.o
+
+.debug_loc      0x0000000000000000        0x0
+ .debug_loc     0x0000000000000000        0x0 arch/x86/gdtfl.o
+ .debug_loc     0x0000000000000000        0x0 arch/x86/interruptsasm.o
+
+.debug_ranges   0x0000000000000000       0x48
+ .debug_ranges  0x0000000000000000       0x30 kernel/vfs.o
+ .debug_ranges  0x0000000000000030       0x18 lib/clist.o

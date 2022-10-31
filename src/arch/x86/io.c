@@ -12,6 +12,6 @@ void io_writePortW(uint32_t port,uint16_t data) {
 }
 uint16_t io_readPortW(uint32_t port) {
 	uint16_t result;
-    asm("inb %w1, %b0": "=a"(result):"Nd"(port));
+    	asm("inw %w1, %w0": "=a"(result):"Nd"(port));
 	return result;
 }
