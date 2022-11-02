@@ -95,8 +95,6 @@ void sh_parseCommand(char **argv,int argc) {
         printf("fault - only debug!\n");
         printf("mpe - didn't work\n");
         printf("args - print arguments information passed to the program\n");
-    } else if (!strcmp(argv[0],"loop")) {
-        for (;;) {}
     } else if (!strcmp(argv[0],"cli")) {
         printf("WARRNING: this command must only check the user task working via invoking privileged instruction!!\n");
         asm volatile("cli");
@@ -139,7 +137,8 @@ bool execute(char *command,char **argv,int argc) {
     if (argc > 1) {
         // check if we need to execute it paralell
         if (!strcmp(argv[argc-1],"&")) {
-            parallel = true;
+            //printf("parallel running\n");
+	    parallel = true;
             argc--;
         }
         new_argv = malloc(100);
