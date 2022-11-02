@@ -9,6 +9,7 @@
 #include<elf.h>
 #include<io.h>
 #include<lib/clist.h>
+#include<symbols.h>
 void parseCommand(int argc,char *cmd[]);
 multiboot_info_t *info;
 vfs_node_t *kshell_tty;
@@ -241,6 +242,8 @@ void parseCommand(int argc,char *cmd[]) {
         process_wait(process_getCurrentPID(),how);
         struct process *me = process_getProcess(process_getCurrentPID());
         while(me->state == PROCESS_WAITING) {}
+    } else if (strcmp(cmd[0],"syms")) {
+	symbols_print();
     } else {
         printf("Unknown command: \"%s\"\n",cmd[0]);
     }

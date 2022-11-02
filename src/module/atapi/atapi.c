@@ -206,13 +206,13 @@ int ata_device_detect(ata_device_t *dev) {
 			printf("ATA: device sectors are zero!\n");
 			return 0;
 		}
-		printf("ATA: detected drive: %s\n",dev->identify.model);
+		printf("ATA: detected drive: %s, serial: %s\n",dev->identify.model,dev->identify.serial);
 		ata_create_device(true);
 	} else if ((cl == 0x14 && ch == 0xEB) || (cl == 0x69 && ch == 0x96)) {
 		printf("ATA: cdrom found\n");
 		ata_create_device(false);
 	} else {
-		printf("ATA: unknown cl and ch return values\n");
+		printf("ATA: unknown cl and ch return values %x %x\n",cl,ch);
 	}
 	return 0;
 }
@@ -247,14 +247,8 @@ void ata_create_device(bool hda) {
 // === Public functions here ===
 void atapi_init() {
 	printf("ATA device driver\n");
-	printf("ATA: detection drives\n");
-	printf("ATA: detection primary master\r\n");
 	ata_device_detect(&ata_primary_master);
-	printf("ATA: detection primary slave\r\n");
 	ata_device_detect(&ata_primary_slave);
-	printf("ATA: detection secondary master\r\n");
 	ata_device_detect(&ata_secondary_master);
-	printf("ATA: detection secondary slave\r\n");
 	ata_device_detect(&ata_secondary_slave);
-	printf("ATA: detection finished\n");
 }

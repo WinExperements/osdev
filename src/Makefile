@@ -2,7 +2,7 @@ ARCH=x86
 CCOPTIONS = -m32 -std=gnu99 -ffreestanding -Wall -Wextra -Wno-unused-parameter -Wint-to-pointer-cast -Wsign-compare -nostdlib -march=i486 -mtune=i486 -fno-stack-protector -g -DLEGACY_TERMINAL
 ASPARAMS =
 CCPATH = 
-OBJECTS = arch/$(ARCH)/boot.o arch/$(ARCH)/terminal.o kernel/kernel.o arch/$(ARCH)/io.o arch/$(ARCH)/serial.o arch/$(ARCH)/arch.o arch/$(ARCH)/gdt.o arch/$(ARCH)/gdtfl.o arch/x86/interrupts.o arch/x86/interruptsasm.o mm/mm.o mm/pmm.o arch/$(ARCH)/vmm.o kernel/mstring.o kernel/process.o kernel/syscall.o kernel/keyboard.o arch/x86/pic.o kernel/elf.o font.o kernel/dev.o ipc/message.o kernel/vfs.o kernel/initrd.o kernel/module.o kernel/kshell.o kernel/rootfs.o kernel/terminal.o lib/clist.o kernel/arch.o
+OBJECTS = arch/$(ARCH)/boot.o arch/$(ARCH)/terminal.o kernel/kernel.o arch/$(ARCH)/io.o arch/$(ARCH)/serial.o arch/$(ARCH)/arch.o arch/$(ARCH)/gdt.o arch/$(ARCH)/gdtfl.o arch/x86/interrupts.o arch/x86/interruptsasm.o mm/mm.o mm/pmm.o arch/$(ARCH)/vmm.o kernel/mstring.o kernel/process.o kernel/syscall.o kernel/keyboard.o arch/x86/pic.o kernel/elf.o font.o kernel/dev.o ipc/message.o kernel/vfs.o kernel/initrd.o kernel/module.o kernel/kshell.o kernel/rootfs.o kernel/terminal.o lib/clist.o kernel/arch.o kernel/symbols.o
 MODULE_OBJS = module/atapi/atapi.o
 %.o: %.c
 	@echo [CC] $<

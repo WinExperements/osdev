@@ -1,8 +1,10 @@
 /* Module loading */
+#include<elf.h>
 typedef struct module {
     char *name;
     int ref_count;
     struct module_segment *seg;
+    Elf32_Sym *symtab;
     void (*init)(struct module *);
     void (*de_init)(struct module *);
 } module_t;

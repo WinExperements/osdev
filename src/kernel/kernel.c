@@ -25,11 +25,13 @@ CDROM or other boot media */
 #include<kshell.h>
 #include<lib/clist.h>
 #include<stddef.h>
+#include<symbols.h>
 extern char kernel_end[];
 extern char kernel_start[];
 bool verbose;
 bool disableStartInit;
 multiboot_info_t *_multiboot;
+void print_symbols();
 void parse_commandLine(char *commandline) {
     char *k = strtok(commandline," ");
     while(k != NULL) {
@@ -59,60 +61,62 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 		//PANIC("Must be at less one module(initrd) passed.");
 	}
 	printf("with %d MB memory\n",(pmml_getMaxBlocks()*4096)/1024/1024);
-    printf("Initializing VMM and VFS\n");
+    	symbols_init(multiboot);
+	printf("Initializing VMM and VFS\n");
 	vmm_init();
 	vfs_init();
 	rootfs_init();
 	rootfs_mount("/");
 	vfs_creat(vfs_getRoot(),"dev",VFS_DIRECTORY);
 	vfs_creat(vfs_getRoot(),"bin",VFS_DIRECTORY);
-    printf("Initializing process manager\n");
+    	printf("Initializing process manager\n");
 	arch_disableIRQ();
 	process_init();
 	arch_enableIRQ();
-    printf("Enabling VMM and Initializing keyboard\n");
+    	printf("Enabling VMM and Initializing keyboard\n");
 	vmm_load();
 	vmm_enable();
 	keyboard_init();
 	//atapi_init();
-    printf("Initializing devfs and tty's\n");
+   	 printf("Initializing devfs and tty's\n");
 	dev_init();
 	tty_init();
-    printf("Initializing kshell\n");
+    	printf("Initializing kshell\n");
 	kshell_init(multiboot);
-    printf("Parsing command line\n");
+    	printf("Parsing command line\n");
 	char *cmdline = (char *)multiboot->cmdline;
 	parse_commandLine(cmdline);
-    printf("Copying modules to ramfs\n");
-    vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"bin");
-    if (!dev) {
-        printf("no /bin found, execution terminated\n");
-        return;
-    } else if ((dev->flags & 0x7) != VFS_DIRECTORY) {
-        printf("/bin not a directory, execution terminated\n");
+    	printf("Copying modules to ramfs\n");
+    	vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"bin");
+    	if (!dev) {
+        	printf("no /bin found, execution terminated\n");
+        	return;
+    	} else if ((dev->flags & 0x7) != VFS_DIRECTORY) {
+        	printf("/bin not a directory, execution terminated\n");
 		return;
-    }
-    for (int i = 0; i < multiboot->mods_count; i++) {
-        multiboot_module_t *mod = (multiboot_module_t *)multiboot->mods_addr+i;
-        if (mod->cmdline != 0) {
-            vfs_node_t *in = vfs_creat(dev,(char *)mod->cmdline,0);
-            vfs_write(in,0,mod->mod_end-mod->mod_start,(void *)mod->mod_start);
-        }
-    }
-    printf("Finishing up\n");
-   atapi_init();
-    if (!disableStartInit) {
-        printf("Starting init\n");
-        if (!exec_init()) {
-            printf("Failed, entering kshell\n");
-            process_create((int)kshell_main,false,"kshell",0,NULL);
-        } else {
-            printf("Init created\n");
-        }
-    } else {
-        process_create((int)kshell_main,false,"kshell",0,NULL);
-    }
-    arch_enableInterrupts();
+    	}
+   	 for (int i = 0; i < multiboot->mods_count; i++) {
+        	multiboot_module_t *mod = (multiboot_module_t *)multiboot->mods_addr+i;
+       		if (mod->cmdline != 0) {
+            		vfs_node_t *in = vfs_creat(dev,(char *)mod->cmdline,0);
+            		vfs_write(in,0,mod->mod_end-mod->mod_start,(void *)mod->mod_start);
+        	}
+    	}
+    	printf("Finishing up\n");
+   	atapi_init();
+    	if (!disableStartInit) {
+        	printf("Starting init\n");
+        	if (!exec_init()) {
+            		printf("Failed, entering kshell\n");
+            		process_create((int)kshell_main,false,"kshell",0,NULL);
+        	} else {
+            		printf("Init created\n");
+        	}
+    	} else {
+        	process_create((int)kshell_main,false,"kshell",0,NULL);
+    	}
+	printf("Value of kernel_main: %x\n",symbols_findValue("kernel_main"));
+    	arch_enableInterrupts();
 }
 bool exec_init() {
 	if (_multiboot->mods_count > 0) {

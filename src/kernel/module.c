@@ -48,6 +48,7 @@ bool module_resolve_name(module_t *mod,Elf32_Ehdr *header) {
         printf("No module name\n");
         return false;
     }
+    printf("%s: setted name: %s\n",__func__,mod->name);
     return true;
 }
 bool module_resolve_dep(module_t *mod,Elf32_Ehdr *e) {
@@ -102,7 +103,30 @@ bool module_load_seg(module_t *mod,Elf32_Ehdr *e) {
         return true;
 }
 bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *e) {
-    return false;
+	unsigned i;
+	Elf32_Shdr *s;
+	Elf32_Sym *sym;
+	const char *str;
+	Elf32_Word size,entsize;
+	for (i = 0, s = (Elf32_Shdr *)((char *)e + e->e_shoff); i < e->e_shnum;
+		i++,s = (Elf32_Shdr *)((char *)s + e->e_shentsize)) {
+		if (s->sh_type == SHT_SYMTAB) break;
+	}
+	if (i == e->e_shnum) {
+		printf("%s: failed to find symbol table in module!\n");
+		return false;
+	}
+	mod->symtab = (Elf32_Sym *)((char *)e + s->sh_offset);
+	sym = mod->symtab;
+	size = s->sh_size;
+	entsize = s->sh_entsize;
+	s = (Elf32_Shdr *)((char *)e + e->e_shoff + e->e_shentsize * s->sh_link);
+	str = (char *)e+ s->sh_offset;
+	for (i = 0; i < size/entsize; i++,sym = (Elf32_Sym *)((char *)sym + entsize)) {
+		const char *name = str + sym->st_name;
+		printf("Find: %s\n",name);
+	}
+    	return false;
 }
 bool module_reloc_symbols(module_t *mod,Elf32_Ehdr *e) {
     return false;
