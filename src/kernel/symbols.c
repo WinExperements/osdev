@@ -24,12 +24,17 @@ Elf32_Shdr *symbols_findSection(multiboot_info_t *inf,char *name) {
         return NULL;
 }
 void symbols_init(multiboot_info_t *inf) {
+	struct multiboot_elf_section_header_table t = inf->u.elf_sec;
+	printf("num -> %d, size -> %d, addr -> %x, shndx -> %d\n",t.num,t.size,t.addr,t.shndx);
 	symtab = symbols_findSection(inf,".symtab");
 	strtab = symbols_findSection(inf,".strtab");
 	if (symtab == NULL || strtab == NULL) {
 		printf("No symbol/string table given by multiboot, abort.\n");
 		return;
+	} else if (symtab->sh_type != SHT_SYMTAB || strtab->sh_type != SHT_STRTAB) {
+		printf("Not valid symtab/strtab!\n");
 	}
+	printf("%s: symtab: %x, strtab: %x\n",__func__,symtab,strtab);
 }
 char *symbols_findName(int value) {
 	Elf32_Sym *symbol = NULL;
@@ -49,11 +54,12 @@ char *symbols_findName(int value) {
 int symbols_findValue(char *f_name) {
 	char *strtab_addr = (char *)strtab->sh_addr;
         Elf32_Sym *symbols = (Elf32_Sym *)symtab->sh_addr;
-        for (int i = 0; i < symtab->sh_size / sizeof(Elf32_Sym); i++) {
+        for (int i = 0; i < symtab->sh_size / sizeof(Elf32_Sym *); i++) {
                 Elf32_Sym *can = symbols + i;
                 uint32_t string_index = can->st_name;
                 char *name = strtab_addr + string_index;
-                if (strcmp(f_name,name)) {
+                //printf("strtab: %x, index: %d\n",strtab_addr,string_index);
+		if (strcmp(f_name,name)) {
 			return can->st_value;
 		}
         }

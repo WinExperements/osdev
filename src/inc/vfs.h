@@ -31,8 +31,17 @@ struct dirent {
 };
 typedef struct vfs_fs {
     char *fs_name;
+    struct vfs_node *(*mount)(struct vfs_node *,void *);
     struct vfs_fs *next;
 } vfs_fs_t;
+typedef struct file_descriptor {
+	int id; // the FD identificator
+	int pid; // owner of the FD
+	int node; // address of node
+	int offset;
+	int en_addr; // file descriptor clist entry address
+	struct file_descriptor *next;
+} file_descriptor_t;
 void vfs_init();
 void vfs_addFS(vfs_fs_t *fs);
 vfs_fs_t *vfs_findFS(char *name);
@@ -53,4 +62,5 @@ void vfs_readBlock(vfs_node_t *node,int blockN,int how,void *buff);
 void vfs_writeBlock(vfs_node_t *node,int blockN,int how,void *buff);
 void vfs_ioctl(vfs_node_t *node,int request,void *argp);
 void vfs_node_path(vfs_node_t *node,char *path,int size);
+void rootfs_insertModuleData(vfs_node_t *node,int size,char *addr);
 #endif

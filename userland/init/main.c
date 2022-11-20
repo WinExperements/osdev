@@ -13,12 +13,20 @@ void sh_parseCommand(char **argv,int argc);
 bool execute(char *command,char **argv,int argc);
 int __argc;
 char **__argv;
+void process_initScript(FILE *);
 int main(int argcf,char **argvf) {
     __argc = argcf;
     __argv = argvf;
     //if (strcmp(argvf[1],"init")) return 0;
     pid = getpid(); // remember pid for waitpid
     ppid = getppid();
+    FILE *init_script = fopen("/bin/init.sh","r");
+    if (!init_script) {
+		printf("init: no init.sh found at /bin. Droping to shell\n");
+    } else {
+	process_initScript(init_script);
+	while(1) {}
+    }
     FILE *f = fopen("/dev/tty","rw");
     char buff[100];
     char *argv[100];
@@ -39,6 +47,7 @@ int main(int argcf,char **argvf) {
     return 0;
 }
 void sh_parseCommand(char **argv,int argc) {
+    if (argv[0][0] == '#') return;
     if (!strcmp(argv[0],"reboot")) {
         helin_syscall(14,0,0,0,0,0);
     } else if (!strcmp(argv[0],"poweroff")) {
@@ -118,6 +127,13 @@ void sh_parseCommand(char **argv,int argc) {
         } else {
             printf("setuid <uid>\n");
         }
+    } else if (!strcmp(argv[0],"echo")) {
+	    if (argc > 1) {
+		for (int i = 1; i < argc; i++) {
+			printf("%s ",argv[i]);
+		}
+		printf("\n");
+	    }
     } else {
         if (!execute(argv[0],argv,argc)) {
             printf("Commmand %s not found\n",argv[0]);
@@ -159,4 +175,30 @@ bool execute(char *command,char **argv,int argc) {
         return false;
     }
     return false;
+}
+void process_initScript(FILE *init_sh) {
+	fseek(init_sh,0,SEEK_END);
+	int offset = ftell(init_sh);
+	fseek(init_sh,0,SEEK_SET);
+	// now try to read it!
+	char *buf = malloc(offset);
+	fread(buf,offset,1,init_sh);
+	fclose(init_sh);
+	char *line = strtok(buf,"\n");
+	int argc = 0;
+	char *argv[100];
+	char *last_ptr = NULL;
+	while(line) {
+		last_ptr = line;
+		argv[argc] = strtok_r(last_ptr," ",&last_ptr);
+		while(argv[argc]) {
+			argc++;
+			argv[argc] = strtok_r(last_ptr," ",&last_ptr);
+			//printf("%s\n",argv[argc]);
+		}
+		sh_parseCommand(argv,argc);
+		argc = 0;
+		line = strtok(NULL,"\n");
+	}
+	free(buf);
 }

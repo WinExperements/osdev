@@ -35,7 +35,7 @@ bochs:
 install:
 	sudo cp kernel.bin /boot/grub
 debug:
-	qemu-system-i386 -kernel kernel.bin -s -S &
+	qemu-system-i386 -cdrom myos.iso -s -S &
 	gdb kernel.bin -tui -x ../debug.gdb
 arm:
 	make -C arch/armv7-a

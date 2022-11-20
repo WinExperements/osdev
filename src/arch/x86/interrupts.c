@@ -120,6 +120,11 @@ void isr_handler(registers_t *regs) {
         arch_enableInterrupts();
         process_yield();
     } else {
+	if (int_no == 14) {
+		int addr = 0;
+		asm volatile("movl %0,%%cr2" : "=r"(addr));
+		printf("Addr: %x\n",addr);
+	}
         PANIC(exception_names[int_no]);
     }
 }

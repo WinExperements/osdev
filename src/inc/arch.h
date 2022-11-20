@@ -3,6 +3,7 @@
 #include <process.h>
 #include<typedefs.h>
 #include<terminal.h>
+#include<module.h>
 #define PANIC(msg) panic(__FILE__,__func__,msg)
 void arch_init(struct multiboot_info *info);
 void arch_reset();
@@ -29,4 +30,5 @@ void arch_destroyStack(void *stack);
 void arch_switchContext(void *newStack) __attribute__((cdecl));
 void arch_switchToUser();
 void arch_set_active_thread(struct process *active);
+bool arch_relocSymbols(module_t *mod,void *ehdr);
 #endif

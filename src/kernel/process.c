@@ -32,6 +32,8 @@ struct process *process_findNextByStatus(int status,int addr);
 struct process *process_findID(int id);
 bool process_findDispatcher(clist_head_t *head,va_list args);
 bool process_findIdDispatcher(clist_head_t *head,va_list args);
+file_descriptor_t *process_findFDDispatcher(clist_head_t *head,va_list args);
+void process_closeDispatcher(clist_head_t *head,va_list args);
 struct process *process_allocateProcess() {
 #ifdef DEBUG
     write_serialString("allocating process!\r\n");
@@ -63,7 +65,7 @@ struct process *process_create(int entryPoint,bool isUser,char *name,int argc,ch
 	if (p->used) {
 		void *frame = arch_buildStack(entryPoint,isUser,argc,argv);
 		p->esp = frame;
-        arch_set_active_thread(p);
+        	arch_set_active_thread(p);
 		p->name = name;
 		p->kernelESP = (isUser ? ((int)pmml_alloc(true)+4096) : 0);
 		p->dir = ((isUser ? 0 : (int)vmm_getCurrentDirectory()));
@@ -71,6 +73,10 @@ struct process *process_create(int entryPoint,bool isUser,char *name,int argc,ch
 		p->esp = (void *)(int)frame;
 		p->parent = process_getCurrentPID();
 		p->state = PROCESS_RUNNING;
+		// UPDATE: Allocate FD list for single process
+		p->fds = pmml_alloc(true);
+		p->fds->head = NULL;
+		p->fds->slot_size = sizeof(file_descriptor_t); 
 		struct process *pa = process_getProcess(p->parent);
         if (pa == NULL) {
             arch_destroyStack(frame);
@@ -171,7 +177,6 @@ void process_schedule(registers_t *stack) {
     }
     if (nextTask == NULL) {
         // okay switch to idle
-        printf("Switching to idle\n");
         nextTask = idle;
     }
     //if (nextTask == runningTask) return;
@@ -306,6 +311,11 @@ void __process_destroy(struct process *task) {
         for (int i = 0; i < task->pages; i++) {
             pmml_free((void *)task->page_start+(i*496));
         }
+	/*
+		Okay since i add FD support and it's need to be closed via sys_close syscall handler
+	*/
+		//clist_find(task->fds,process_closeDispatcher);
+		// now free the clist head structure
 		if (task->user) {
             		pmml_free((void *)task->dir);
         }

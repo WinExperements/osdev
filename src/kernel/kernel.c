@@ -86,7 +86,7 @@ extern void kernel_main(struct multiboot_info *multiboot) {
     	printf("Parsing command line\n");
 	char *cmdline = (char *)multiboot->cmdline;
 	parse_commandLine(cmdline);
-    	printf("Copying modules to ramfs\n");
+    	printf("Filling ramfs with modules\n");
     	vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"bin");
     	if (!dev) {
         	printf("no /bin found, execution terminated\n");
@@ -99,7 +99,7 @@ extern void kernel_main(struct multiboot_info *multiboot) {
         	multiboot_module_t *mod = (multiboot_module_t *)multiboot->mods_addr+i;
        		if (mod->cmdline != 0) {
             		vfs_node_t *in = vfs_creat(dev,(char *)mod->cmdline,0);
-            		vfs_write(in,0,mod->mod_end-mod->mod_start,(void *)mod->mod_start);
+            		rootfs_insertModuleData(in,mod->mod_end-mod->mod_start,(char *)mod->mod_start);
         	}
     	}
     	printf("Finishing up\n");
@@ -115,7 +115,6 @@ extern void kernel_main(struct multiboot_info *multiboot) {
     	} else {
         	process_create((int)kshell_main,false,"kshell",0,NULL);
     	}
-	printf("Value of kernel_main: %x\n",symbols_findValue("kernel_main"));
     	arch_enableInterrupts();
 }
 bool exec_init() {

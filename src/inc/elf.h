@@ -86,7 +86,7 @@ enum ShT_Attributes {
 	SHF_WRITE	= 0x01, // Writable section
 	SHF_ALLOC	= 0x02  // Exists in memory
 };
-typedef struct {
+typedef struct _Elf32_Sym {
 	Elf32_Word		st_name;
 	Elf32_Addr		st_value;
 	Elf32_Word		st_size;
@@ -103,7 +103,9 @@ enum StT_Bindings {
 enum StT_Types {
 	STT_NOTYPE		= 0, // No type
 	STT_OBJECT		= 1, // Variables, arrays, etc.
-	STT_FUNC		= 2  // Methods or functions
+	STT_FUNC		= 2,  // Methods or functions
+	STT_SECTION		= 3,
+	STT_FILE		= 4,
 };
 typedef struct {
 	Elf32_Addr		r_offset;

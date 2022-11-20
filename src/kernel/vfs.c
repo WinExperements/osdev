@@ -90,11 +90,34 @@ void vfs_mount(vfs_node_t *root,char *mountPoint) {
     }
     if (strcmp(mountPoint,"/")) {
         fs_root = root;
-    }
+    } else {
+        vfs_node_t *mount_point = vfs_find(mountPoint);
+	if (!mount_point) {
+		printf("%s: no such file or directory\n",mountPoint);
+		return;
+	} else if ((mount_point->flags & 0x7) != VFS_DIRECTORY) {
+		printf("%s: not directory\n",mountPoint);
+		return;
+	}
+	// call the actual mount function(if present)
+	//if (
+	// replace all I/O functions with the root directory functions
+	mount_point->read = root->read;
+	mount_point->write = root->write;
+	mount_point->open = root->open;
+	mount_point->close = root->close;
+	mount_point->finddir = root->finddir;
+	mount_point->readdir = root->readdir;
+	mount_point->creat = root->creat;
+	mount_point->truncate = root->truncate;
+	mount_point->readBlock = root->readBlock;
+	mount_point->writeBlock = root->writeBlock;
+	mount_point->ioctl = root->ioctl;
+   }
 }
 vfs_node_t *vfs_creat(vfs_node_t *in,char *name,int flags) {
     if (!in || !in->creat) {
-        printf("mkdir: broken target\n");
+        printf("touch: broken target\n");
         return NULL;
     }
     return in->creat(in,name,flags);

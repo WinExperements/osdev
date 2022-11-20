@@ -29,6 +29,8 @@ int sys_getppid(int p1,int p2,int p3,int p4,int p5);
 int sys_sysinfo(int p1,int p2,int p3,int p4,int p5);
 int sys_getuid(int p1,int p2,int p3,int p4,int p5);
 int sys_setuid(int p1,int p2,int p3,int p4,int p5);
+int sys_seek(int fd,int type,int how,int u3,int u4);
+int sys_tell(int fd,int u1,int u2,int u3,int u4);
 registers_t *syscall_handler(registers_t *regs);
 /*
  * Because we can't directly modify user memory,

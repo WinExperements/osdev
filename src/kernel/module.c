@@ -5,6 +5,8 @@
 #include<terminal.h>
 #include<mstring.h>
 #include<mm.h>
+#include<symbols.h>
+bool arch_relocSymbols(module_t *,void *);
 bool module_resolve_name(module_t *mod,Elf32_Ehdr *);
 bool module_resolve_dep(module_t *,Elf32_Ehdr *);
 bool module_load_seg(module_t *mod,Elf32_Ehdr *);
@@ -25,7 +27,19 @@ module_t *load_module(void *address) {
         || !module_reloc_symbols(mod,header)) {
             return NULL;
         }
+	printf("module init void address: %x\n",mod->init);
     return mod;
+}
+void *module_get_section_addr(module_t *mod,unsigned n) {
+	module_segment_t *seg;
+	for (seg = mod->seg; seg; seg = seg->next) {
+		if (seg->section == n) {
+			//printf("Return %x\n",seg->addr);
+			return seg->addr;
+		}
+	}
+	printf("%s: no section with id: %d\n",__func__,n);
+	return NULL;
 }
 bool module_resolve_name(module_t *mod,Elf32_Ehdr *header) {
     Elf32_Shdr *s;
@@ -123,11 +137,48 @@ bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *e) {
 	s = (Elf32_Shdr *)((char *)e + e->e_shoff + e->e_shentsize * s->sh_link);
 	str = (char *)e+ s->sh_offset;
 	for (i = 0; i < size/entsize; i++,sym = (Elf32_Sym *)((char *)sym + entsize)) {
+		uint8_t type = ELF32_ST_TYPE(sym->st_info);
+		uint8_t bind = ELF32_ST_BIND(sym->st_info);
 		const char *name = str + sym->st_name;
-		printf("Find: %s\n",name);
+		switch (type) {
+			case STT_NOTYPE:
+			case STT_OBJECT:
+			if (sym->st_name != 0 && sym->st_shndx == 0) {
+				sym->st_value += (Elf32_Addr)symbols_findValue(name);
+				if (!sym->st_value) {
+					printf("Cannot find symbol %s in kernel, abort\n",name);
+					return false;
+				}
+			} else {
+				Elf32_Shdr *sh_hdr = (Elf32_Shdr *)(e + e->e_shoff + e->e_shentsize * mod->symtab[i].st_shndx);
+				sym->st_value += sh_hdr->sh_addr;
+				printf("Symbol name: %s, address: %x\n",name,sym->st_value);
+			} break;
+			case STT_FUNC:
+			sym->st_value += (Elf32_Addr) module_get_section_addr(mod,sym->st_shndx);
+			printf("Symbol name v2: %s, address: %x\n",name,sym->st_value);
+			if (bind != STB_LOCAL) {
+				printf("TODO: This function %s also need to be added to global symbols table\n",name);
+			}
+			if (strcmp(name,"module_main")) {
+				//printf("Module init found\n");
+				mod->init = (void (*)(module_t *))sym->st_value;
+			}
+			break;
+			case STT_SECTION:
+			sym->st_value += (Elf32_Addr) module_get_section_addr(mod,sym->st_shndx);
+			break;
+			case STT_FILE:
+			sym->st_value = 0;
+			break;
+			default:
+			printf("Unknown symbol type: %d,%s\n",type,name);
+			return false;
+			break;
+		}
 	}
-    	return false;
+	return true;
 }
 bool module_reloc_symbols(module_t *mod,Elf32_Ehdr *e) {
-    return false;
+    	return arch_relocSymbols(mod,(void *)e);
 }

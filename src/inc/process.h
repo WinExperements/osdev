@@ -38,6 +38,7 @@ struct process {
     void *arch_task; // Architecture dependes task structure
     int uid;
     int guid;
+    clist_definition_t *fds; // file descriptors!
 };
 extern struct process *runningTask;
 /* 
@@ -121,4 +122,8 @@ void process_enableScheduler();
  * Return current PID index, mostly used for exec syscall
 */
 int process_getNextPID();
+/*
+ * Return file_descriptor_t by id for specific process
+*/
+file_descriptor_t *process_findFD(struct process *,int);
 #endif

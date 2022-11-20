@@ -1,5 +1,7 @@
 /* Module loading */
-#include<elf.h>
+#ifndef MODULE_H
+#define MODULE_H
+#include <elf.h>
 typedef struct module {
     char *name;
     int ref_count;
@@ -17,3 +19,4 @@ typedef struct module_segment
 } module_segment_t;
 
 module_t *load_module(void *address);
+#endif

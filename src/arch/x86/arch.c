@@ -6,6 +6,7 @@
 #include <mm/pmm.h>
 #include<io.h>
 #include<process.h>
+#include<elf.h>
 #define PUSH(tos,val) (*(-- tos) = val)
 void gpf_exc(registers_t *);
 void x86_userSwitch(int entryPoint,int user_esp);
@@ -168,4 +169,60 @@ void x86_userSwitch(int entryPoint,int stack) {
 }
 void arch_set_active_thread(struct process *active) {
     __active = active;
+}
+bool arch_relocSymbols(module_t *mod,void *ehdr) {
+	Elf32_Ehdr *e = (Elf32_Ehdr *)ehdr;
+	Elf32_Shdr *s;
+	Elf32_Word entsize;
+	unsigned i;
+	// Find symbol table
+	for (i = 0,s = (Elf32_Shdr *)((char *) e + e->e_shoff); i < e->e_shnum;
+		i++,s = (Elf32_Shdr *)((char *) s + e->e_shentsize)) {
+		if (s->sh_type == SHT_SYMTAB) {
+			break;
+		}
+	}
+	if (i == e->e_shnum) {
+		printf("relloc: no symbol table to relocate!\n");
+		return false;
+	}
+	entsize = s->sh_entsize;
+	for (i = 0,s = (Elf32_Shdr *)((char *)e + e->e_shoff); i < e->e_shnum;
+		i++,s = (Elf32_Shdr *)((char *)s + e->e_shentsize)) {
+			if (s->sh_type == SHT_REL) {
+				printf("Relocation segment\n");
+				module_segment_t *seg;
+				for (seg = mod->seg; seg; seg = seg->next) {
+					if (seg->section == s->sh_info) break;
+				}
+				if (seg) {
+					Elf32_Rel *rel,*max;
+					for (rel = (Elf32_Rel *)((char *) e + s->sh_offset),
+						max = rel + s->sh_size / s->sh_entsize;
+						rel < max;
+						rel++) {
+						Elf32_Word *addr;
+						Elf32_Sym *sym;
+						if (seg->size < rel->r_offset) {
+							printf("Relloc offset is out of segment\n");
+							return false;
+						}
+						addr = (Elf32_Word *)((char *)seg->addr + rel->r_offset);
+						sym = (Elf32_Sym *)((char *)mod->symtab + entsize * ELF32_R_SYM(rel->r_info));
+						switch (ELF32_R_TYPE(rel->r_info)) {
+							case R_386_32:
+								*addr += sym->st_value;
+								break;
+							case R_386_PC32:
+								*addr += (sym->st_value - (Elf32_Word)seg->addr - rel->r_offset);
+								break;
+							default:
+							printf("Unknown relocation type!\n");
+							break;
+						}
+					}
+				}
+			}
+	}
+	return true;
 }

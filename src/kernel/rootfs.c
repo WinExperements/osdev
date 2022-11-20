@@ -108,3 +108,7 @@ void rootfs_truncate(vfs_node_t *node,int size) {
     node->size = size;
 }
 void rootfs_close(vfs_node_t *node) {}
+void rootfs_insertModuleData(vfs_node_t *node,int size,char *addr) {
+	data[node->inode] = addr;
+	node->size = size;
+}

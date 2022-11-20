@@ -15,7 +15,11 @@ void printf(const char *message,...) {
 FILE *fopen(char *file,char *mode) {
 	if (!file) return NULL;
 	// now lests use our syscall
-	return (FILE *)helin_syscall(7,(int)file,7,0,0,0);
+	int flags = 0;
+	if (mode[0] == 'r') {
+		flags = 6;
+	} else if (!strcmp(mode,"rw") || mode[0] == 'w') flags = 7;
+	return (FILE *)helin_syscall(7,(int)file,flags,0,0,0);
 }
 int fwrite(char *buff,int size,int how,FILE *f) {
 	int ret = 0;
@@ -31,4 +35,10 @@ int fread(void *buff,int size,int how,FILE *f) {
 	int count = size*how;
 	ret = helin_syscall(9,(int)f,0,count,(int)buff,0);
 	return ret;
+}
+int fseek(FILE *stream,long offset,int origin) {
+	return helin_syscall(27,(int)stream,origin,offset,0,0);
+}
+int ftell(FILE *stream) {
+	return helin_syscall(28,(int)stream,0,0,0,0);
 }

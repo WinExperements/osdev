@@ -36,14 +36,17 @@ static void *syscalls[] = {
 	&sys_closedir,
 	&sys_readdir,
 	&sys_exec_shell,
-    &sys_waitpid,
-    &sys_getppid,
-    &sys_sysinfo,
-    &sys_getuid,
-    &sys_setuid
+        &sys_waitpid,
+        &sys_getppid,
+        &sys_sysinfo,
+        &sys_getuid,
+        &sys_setuid,
+	&sys_seek,
+	&sys_tell
 };
+int _global_fd = 0;
 registers_t *syscall_handler(registers_t *regs) {
-	if (regs->eax > 26) {
+	if (regs->eax > 28) {
 		printf("No such syscall number: %d\n",regs->eax);
 	} else {
         arch_enableInterrupts();
@@ -89,22 +92,53 @@ int sys_recev(int p1,int p2,int p3,int p4,int p5) {
 }
 int sys_open(int p1,int p2,int p3,int p4,int p5) {
 	int flags = p2;
-	vfs_node_t *node = vfs_find((char *)p1);
+	char *path = copy_from_user((void *)p1);
+	vfs_node_t *node = vfs_find(path);
 	if (!node && flags == 7) {
 		node = vfs_creat(vfs_getRoot(),(char *)p1,0);
 	}
-	return (int)node;
+	pmml_free(path);
+	if (!node) return NULL;
+	struct process *caller = process_getProcess(process_getCurrentPID());
+	// UPDATE: Generate file descriptor and return
+	clist_head_t *entry = clist_insert_entry_after(caller->fds,caller->fds->head);
+	if (!entry) {
+		printf("open: cannot insert FD into list\n");
+		return -1;
+	}
+	file_descriptor_t *fd = (file_descriptor_t *)entry->data;
+	fd->id = _global_fd++;
+	fd->pid = caller->pid;
+	fd->node = (int)node;
+	fd->en_addr = (int)entry;
+	return (int)fd; // Need to be fixed!
 }
 int sys_close(int p1,int p2,int p3,int p4,int p5) {
-	vfs_close((vfs_node_t *)p1);
+	file_descriptor_t *fd = (file_descriptor_t *)p1;
+	if (fd == 0) {
+		printf("close: invalid FD passed\n");
+		return 0;
+	}
+	vfs_close((vfs_node_t *)fd->node);
+	// get the caller
+	struct process *caller = process_getProcess(process_getCurrentPID());
+	// security check!
+	if (caller == NULL) {
+		printf("close: invalid caller!\n");
+	}
+	clist_delete_entry(caller->fds,(clist_head_t *)fd->en_addr); // entry address!
 	return 0;
 }
 int sys_read(int p1,int p2,int p3,int p4,int p5) {
-	vfs_read((vfs_node_t *)p1,p2,p3,(int *)p4);
+	file_descriptor_t *fd = (file_descriptor_t *)p1;
+	if (fd == NULL) return 1;
+	vfs_read((vfs_node_t *)fd->node,fd->offset,p3,(int *)p4);
 	return 0;
 }
 int sys_write(int p1,int p2,int p3,int p4,int p5) {
-	vfs_write((vfs_node_t *)p1,p2,p3,(int *)p4);
+	file_descriptor_t *fd = (file_descriptor_t *)p1;
+        if (fd == NULL) return 1;
+        vfs_write((vfs_node_t *)fd->node,fd->offset,p3,(int *)p4);
 	return 0;
 }
 int sys_alloc(int p1,int p2,int p3,int p4,int p5) {
@@ -119,7 +153,7 @@ int sys_free(int p1,int p2,int p3,int p4,int p5) {
 	return 0;
 }
 int sys_exec(int p1,int p2,int p3,int p4,int p5) {
-	char *path = (char *)p1;
+	char *path = copy_from_user((void *)p1);
 	vfs_node_t *node = vfs_find(path);
 	if (!node) return -1;
 	if ((node->flags & 0x7) == VFS_DIRECTORY) {
@@ -133,9 +167,11 @@ int sys_exec(int p1,int p2,int p3,int p4,int p5) {
         	printf("exec: loading elf failed!\n");
             pmml_freePages(addr,pages);
         	arch_enableInterrupts();
+		pmml_free(path);
 		return -2;
 	}
 	pmml_freePages(addr,pages);
+	pmml_free(path);
    	// process_dump(process_getProcess(process_getProcesses()-1));
 	return process_getNextPID()-1;
 }
@@ -176,7 +212,11 @@ int sys_closedir(int p1,int p2,int p3,int p4,int p5) {
 	return 0;
 }
 int sys_readdir(int p1,int p2,int p3,int p4,int p5) {
-	vfs_node_t *node = (vfs_node_t *)p1;
+	file_descriptor_t *fd = (file_descriptor_t *)p1;
+	if (!fd) {
+		return 0;
+	}
+	vfs_node_t *node = (vfs_node_t *)fd->node;
 	if (node) {
 		return (int)vfs_readdir(node,p2);
 	}
@@ -252,4 +292,23 @@ int sys_getuid(int p1,int p2,int p3,int p4,int p5) {
 int sys_setuid(int p1,int p2,int p3,int p4,int p5) {
     process_getProcess(process_getCurrentPID())->uid = p1;
     return 0;
+}
+int sys_seek(int fd,int type,int how,int u3,int u4) {
+	if (fd == 0) return -1;
+	file_descriptor_t *fd_s = (file_descriptor_t *)fd;
+	vfs_node_t *node = (vfs_node_t *)fd_s->node;
+	if (type == 2) { // SEEK_SET
+		fd_s->offset = how;
+	} else if (type == 3) { // SEEK_END
+		fd_s->offset = node->size+how;
+	} else {
+		// If not 2 or 3 so set offset like SEEK_CUR
+		fd_s->offset = fd_s->offset+how;
+	}
+	return 0;
+}
+int sys_tell(int fd,int u1,int u2,int u3,int u4) {
+	if (fd == 0) return -1;
+        file_descriptor_t *fd_s = (file_descriptor_t *)fd;
+	return fd_s->offset;
 }
