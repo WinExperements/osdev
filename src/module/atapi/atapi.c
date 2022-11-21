@@ -233,9 +233,11 @@ void ata_create_device(bool hda) {
 		name[2] = ata_cdrom_char;
 		ata_cdrom_char++;
 	}
+#ifdef DEBUG
 	write_serialString("creating ATA device with name: ");
 	write_serialString(name);
 	write_serialString("\r\n");
+#endif
 	dev_t *disk = pmml_alloc(true);
 	disk->name = name;
 	disk->write = ata_vdev_write;

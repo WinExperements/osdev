@@ -47,7 +47,8 @@ void kshell_init(multiboot_info_t *i) {
 }
 void getInput(char *buff,int how) {
     // let's use our syscall
-    syscall(9,(int)kshell_tty,0,100,(int)buff,0);
+    arch_enableInterrupts();
+    vfs_read(kshell_tty,0,100,buff);
 }
 void kshell_main() {
     printf("Kernel debugger shell\n");

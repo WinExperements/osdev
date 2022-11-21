@@ -109,9 +109,11 @@ int pmml_free(void *addr)
 	int frame = add / 4096;
 	mmap_set(frame,false);
 	used_blocks--;
-      write_serialString("free ");
-    write_serialHex(add);
-    write_serialString("\r\n");
+#ifdef DEBUG
+      	write_serialString("free ");
+    	write_serialHex(add);
+    	write_serialString("\r\n");
+#endif
 	return true;
 }
 int pmml_getMemorySize() {

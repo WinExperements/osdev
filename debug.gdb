@@ -1,3 +1,3 @@
 target remote localhost:1234
-b sys_opendir
+b kshell_main
 c

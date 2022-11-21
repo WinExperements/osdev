@@ -133,12 +133,14 @@ int sys_read(int p1,int p2,int p3,int p4,int p5) {
 	file_descriptor_t *fd = (file_descriptor_t *)p1;
 	if (fd == NULL) return 1;
 	vfs_read((vfs_node_t *)fd->node,fd->offset,p3,(int *)p4);
+	fd->offset+=p3;
 	return 0;
 }
 int sys_write(int p1,int p2,int p3,int p4,int p5) {
 	file_descriptor_t *fd = (file_descriptor_t *)p1;
         if (fd == NULL) return 1;
         vfs_write((vfs_node_t *)fd->node,fd->offset,p3,(int *)p4);
+	fd->offset+=p3;
 	return 0;
 }
 int sys_alloc(int p1,int p2,int p3,int p4,int p5) {
