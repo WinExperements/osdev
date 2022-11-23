@@ -116,8 +116,8 @@ ata_device_t ata_primary_slave    = {.base = 0x1F0, .ctrl = 0x3F6, .slave = 1};
 ata_device_t ata_secondary_master = {.base = 0x170, .ctrl = 0x376, .slave = 0};
 ata_device_t ata_secondary_slave  = {.base = 0x170, .ctrl = 0x376, .slave = 1};
 void ata_create_device(bool hda);
-void ata_vdev_read(char *buff,int how);
-void ata_vdev_write(void *buff,int size);
+void ata_vdev_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
+void ata_vdev_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
 char ata_start_char = 'a';
 char ata_cdrom_char = 'a';
 void ata_io_wait(ata_device_t *dev) {
@@ -216,10 +216,10 @@ int ata_device_detect(ata_device_t *dev) {
 	}
 	return 0;
 }
-void ata_vdev_read(char *buff,int how) {
+void ata_vdev_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
 	printf("ATA: read didn't supported!\n");
 }
-void ata_vdev_write(void *buff,int size) {
+void ata_vdev_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
 	printf("ATA: write didn't supported\n");
 }
 void ata_create_device(bool hda) {

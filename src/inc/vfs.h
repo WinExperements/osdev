@@ -21,6 +21,7 @@ typedef struct vfs_node {
     void (*readBlock)(struct vfs_node *node,int blockN,int how,void *buff);
     void (*writeBlock)(struct vfs_node *node,int blockN,int how,void *buff);
     void (*ioctl)(struct vfs_node *node,int request,void *argp);
+    void *(*mmap)(struct vfs_node *node,int addr,int size,int offset,int flags);
     struct vfs_node *prev;
     struct vfs_node *first_child;
     struct vfs_node *next_child;
@@ -52,7 +53,7 @@ void vfs_close(vfs_node_t *node);
 struct dirent *vfs_readdir(vfs_node_t *in,uint32_t index);
 vfs_node_t *vfs_finddir(vfs_node_t *in,char *name);
 vfs_node_t *vfs_getRoot();
-void vfs_mount(vfs_node_t *root,char *mountPoint);
+void vfs_mount(vfs_fs_t *fs,char *mountPoint);
 vfs_node_t *vfs_creat(vfs_node_t *in,char *name,int flags);
 void rootfs_init();
 void rootfs_mount(char *to);
@@ -63,4 +64,5 @@ void vfs_writeBlock(vfs_node_t *node,int blockN,int how,void *buff);
 void vfs_ioctl(vfs_node_t *node,int request,void *argp);
 void vfs_node_path(vfs_node_t *node,char *path,int size);
 void rootfs_insertModuleData(vfs_node_t *node,int size,char *addr);
+void *vfs_mmap(struct vfs_node *node,int addr,int size,int offset,int flags);
 #endif

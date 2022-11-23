@@ -131,6 +131,7 @@ int *vmm_createDirectory() {
   for (int i = 0,frame=0x0, virt=0x00000000; i < 1024; i++,frame+=4096, virt+=4096) {
     bios[PAGE_TABLE_INDEX(virt)] = (frame) | 7;
   }
+  bios[PAGE_TABLE_INDEX(0)] = (0) | 3; // secure address 0 for writing/reading from user-space programs
   for (int i=0, frame=0x100000, virt=0xc0000000; i<1024; i++, frame+=4096, virt+=4096) {
     gb3[PAGE_TABLE_INDEX(virt)] = (frame) | 7;
    }

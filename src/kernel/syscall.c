@@ -42,14 +42,15 @@ static void *syscalls[] = {
         &sys_getuid,
         &sys_setuid,
 	&sys_seek,
-	&sys_tell
+	&sys_tell,
+	&sys_mmap
 };
 int _global_fd = 0;
 registers_t *syscall_handler(registers_t *regs) {
-	if (regs->eax > 28) {
+	arch_enableInterrupts();
+	if (regs->eax > 29) {
 		printf("No such syscall number: %d\n",regs->eax);
 	} else {
-        arch_enableInterrupts();
 		int (*handler)(int,int,int,int,int) = (int (*)(int,int,int,int,int))syscalls[regs->eax];
 		regs->eax = handler(regs->edx,regs->ecx,regs->ebx,regs->edi,regs->esi);
 	}
@@ -98,7 +99,10 @@ int sys_open(int p1,int p2,int p3,int p4,int p5) {
 		node = vfs_creat(vfs_getRoot(),(char *)p1,0);
 	}
 	pmml_free(path);
-	if (!node) return NULL;
+	if (!node) {
+		printf("fnf\n");
+		return NULL;
+	}
 	struct process *caller = process_getProcess(process_getCurrentPID());
 	// UPDATE: Generate file descriptor and return
 	clist_head_t *entry = clist_insert_entry_after(caller->fds,caller->fds->head);
@@ -127,6 +131,7 @@ int sys_close(int p1,int p2,int p3,int p4,int p5) {
 		printf("close: invalid caller!\n");
 	}
 	clist_delete_entry(caller->fds,(clist_head_t *)fd->en_addr); // entry address!
+	pmml_free(fd);
 	return 0;
 }
 int sys_read(int p1,int p2,int p3,int p4,int p5) {
@@ -165,9 +170,9 @@ int sys_exec(int p1,int p2,int p3,int p4,int p5) {
 	int pages = (node->size/4096)+1;
 	void *addr = pmml_allocPages(pages,true);
 	vfs_read(node,0,node->size,addr);
+	//printf("sys_exec: arguments count: %d, arguments address: %x\n",p2,p3);
 	if (!elf_load_file(addr,true,node->name,p2,(char **)p3,(char **)p4)) {
-        	printf("exec: loading elf failed!\n");
-            pmml_freePages(addr,pages);
+            	pmml_freePages(addr,pages);
         	arch_enableInterrupts();
 		pmml_free(path);
 		return -2;
@@ -251,6 +256,11 @@ int sys_exec_shell(int p1,int p2,int p3,int p4,int p5) {
 		pmml_free(_fs);
 		return -4;
 	}
+	// try to mount here
+	vfs_mount(fs,_mount_dir);
+	pmml_free(dev);
+	pmml_free(_mount_dir);
+	pmml_free(_fs);
     	return 0;
 }
 int sys_waitpid(int p1,int p2,int p3,int p4,int p5) {
@@ -313,4 +323,12 @@ int sys_tell(int fd,int u1,int u2,int u3,int u4) {
 	if (fd == 0) return -1;
         file_descriptor_t *fd_s = (file_descriptor_t *)fd;
 	return fd_s->offset;
+}
+int sys_mmap(int fd,int addr,int size,int offset,int flags) {
+	if (fd != 0) {
+		file_descriptor_t *f = (file_descriptor_t *)fd;
+		vfs_node_t *n = (vfs_node_t *)f->node;
+		return (int)vfs_mmap(n,addr,size,offset,flags);
+	}
+	return 0;
 }

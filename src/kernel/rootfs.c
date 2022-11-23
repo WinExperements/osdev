@@ -16,11 +16,13 @@ vfs_node_t *rootfs_creat(vfs_node_t *node,char *name,int flags);
 void rootfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
 void rootfs_truncate(vfs_node_t *in,int size);
 void rootfs_close(vfs_node_t *in);
+vfs_node_t *__rootfs_mount(vfs_node_t *,void *);
 char **data;
 void rootfs_init() {
     // we need to register new FS
     rootfs_fs = pmml_alloc(true);
     rootfs_fs->fs_name = "rootfs";
+    rootfs_fs->mount = __rootfs_mount;
     root = pmml_alloc(true);
     root->name = "/";
     root->flags = VFS_DIRECTORY;
@@ -96,7 +98,7 @@ vfs_node_t *rootfs_creat(vfs_node_t *node,char *name,int flags) {
     return newDir;
 }
 void rootfs_mount(char *to) {
-    vfs_mount(root,to);
+    vfs_mount(rootfs_fs,to);
 }
 void rootfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
     char *buff = pmml_allocPages((how/4096)+1,true);
@@ -111,4 +113,14 @@ void rootfs_close(vfs_node_t *node) {}
 void rootfs_insertModuleData(vfs_node_t *node,int size,char *addr) {
 	data[node->inode] = addr;
 	node->size = size;
+}
+vfs_node_t *__rootfs_mount(vfs_node_t *to,void *params) {
+#ifdef DEBUG
+	write_serialString("rootfs mounted to ");
+	write_serialString(to->name);
+	write_serialString(" params address: ");
+	write_serialHex((int)params);
+	write_serialString("\r\n");
+#endif
+	return root;
 }

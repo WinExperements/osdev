@@ -69,6 +69,7 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 	rootfs_mount("/");
 	vfs_creat(vfs_getRoot(),"dev",VFS_DIRECTORY);
 	vfs_creat(vfs_getRoot(),"bin",VFS_DIRECTORY);
+	vfs_creat(vfs_getRoot(),"initrd",VFS_DIRECTORY);
     	printf("Initializing process manager\n");
 	arch_disableIRQ();
 	process_init();

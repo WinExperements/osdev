@@ -275,3 +275,22 @@ int terminal_getBufferSize() {
   #endif
   return size;
 }
+void fbdev_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
+	memcpy(buf,vgaFramebuffer+offset,how);
+}
+void fbdev_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
+	memcpy(vgaFramebuffer+offset,buf,how);
+}
+void *fbdev_mmap(struct vfs_node *node,int addr,int size,int offset,int flags) {
+	// FIXME: Fix and add normal FB mapping!
+	return vgaFramebuffer;
+}
+void fbdev_init() {
+	dev_t *fbdev = pmml_alloc(true);
+	fbdev->name = "fb0";
+	fbdev->buffer_sizeMax = vgaW*vgaH*vgaP;
+	fbdev->write = fbdev_write;
+	fbdev->read = fbdev_read;
+	fbdev->mmap = fbdev_mmap;
+	dev_add(fbdev);
+}

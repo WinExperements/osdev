@@ -85,6 +85,11 @@ void *pmml_alloc(bool clear) {
 	if (frame == -1) {
 		printf("%s: Cannot found first free block, %x\n",__func__,frame);
 		return NULL;
+	} else if (frame == 0) {
+		printf("%s: allocation 0x0 didn't allowed retrying!\n",__func__);
+		mmap_set(frame,true);
+		// retry
+		return pmml_alloc(clear);
 	}
 	if (!mmap_test(frame)) {
         mmap_set(frame,true);
@@ -105,6 +110,9 @@ void *pmml_alloc(bool clear) {
 }
 int pmml_free(void *addr)
 {
+	if (addr == NULL) {
+		printf("W: How you allocated the address 0x0?\n");
+	}
 	uint32_t add = (uint32_t)addr;
 	int frame = add / 4096;
 	mmap_set(frame,false);
@@ -131,6 +139,11 @@ void *pmml_allocPages(int count,bool clear) {
 		if (frame == -1) {
 			printf("%s: Cannot find any free blocks\n",__func__);
 			return NULL;
+		}
+		if (frame == 0) {
+			printf("Page 0 didn't allowed to allocate(pmm-protect)\n");
+			mmap_set(0,true);
+			return pmml_allocPages(count,clear);
 		}
 		for (int i = 0; i < count; i++) {
             if (mmap_test(frame+i)) {

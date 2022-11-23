@@ -18,6 +18,9 @@ void dev_init() {
 void dev_add(dev_t *dev) {
     vfs_node_t *fil = vfs_creat(dev_dir,dev->name,0);
     vfs_truncate(fil,dev->buffer_sizeMax);
+    fil->read = dev->read;
+    fil->write = dev->write;
+    fil->mmap = dev->mmap;
     if (!device) {
         device = dev;
     } else {

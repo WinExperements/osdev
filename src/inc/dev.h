@@ -1,10 +1,13 @@
 #ifndef DEV_H
 #define DEV_H
+#include<typedefs.h>
+#include<vfs.h>
 typedef struct dev {
     char *name;
     int buffer_sizeMax;
-    void (*write)(void *buffer,int size);
-    void (*read)(char *buffer,int size);
+    void (*write)(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
+    void (*read)(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
+    void *(*mmap)(struct vfs_node *node,int addr,int size,int offset,int flags);
     struct dev *next;
     struct dev *prev;
 } dev_t;

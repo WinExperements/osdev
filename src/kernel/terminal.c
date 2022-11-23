@@ -7,6 +7,7 @@
 #include<arch.h>
 #include<vfs.h>
 dev_t *tty;
+extern void fbdev_init(); // defined in arch/x86/terminal.c
 void printf_syscall(const char *msg) {
 	int res;
 	int num = 1;
@@ -40,10 +41,11 @@ void printf(char *format,...) {
 	}
 	va_end(arg);
 }
-void tty_write(void *buffer,int size) {
+void tty_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buffer) {
   printf(buffer);
 }
-void tty_read(char *buff,int how) {
+void tty_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
+  char *buff = (char *)buf;
   int i = 0;
    while(i < (how-1)) {
     char c = keyboard_get();
@@ -68,6 +70,9 @@ void tty_init() {
   tty->read = tty_read;
   tty->buffer_sizeMax = 1;
   dev_add(tty);
+  #ifndef LEGACY_TERMINAL
+  fbdev_init();
+  #endif
 }
 void terminal_writestring(const char *c) {
 	int i =0;

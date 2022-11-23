@@ -293,17 +293,16 @@ void __process_destroy(struct process *task) {
                 printf("W: parent %d of %d null, reseting running task!\n",task->parent,task->pid);
                 runningTask = NULL;
         }
-        if (parent->state != PROCESS_WAITPID) {
-            printf("W: process didn't call waitpid()!\n");
-        }
+	if (parent->state == PROCESS_WAITPID) {
 		process_unblock(parent->pid);
-		curTasks--;
+	}
+	curTasks--;
         if (task->arch_task != 0) {
             arch_destroyStack(task->arch_task);
             pmml_free(task->arch_task);
         }
-		pmml_free(task->esp);
-		/*
+	pmml_free(task->esp);
+	/*
          * We don't free the memory, because i have bug here
          * so it's need to be rewriten and will be enabled
          * Sergij Yevchuk - Main Developer
@@ -315,15 +314,16 @@ void __process_destroy(struct process *task) {
 		Okay since i add FD support and it's need to be closed via sys_close syscall handler
 	*/
 		//clist_find(task->fds,process_closeDispatcher);
-		// now free the clist head structure
-		if (task->user) {
-            		pmml_free((void *)task->dir);
+	pmml_free(task->fds);
+	// now free the clist head structure
+	if (task->user) {
+            	pmml_free((void *)task->dir);
         }
-		if (task->kernelESP != 0) {
-			pmml_free((void *)task->kernelESP);
-		}
-		clist_delete_entry(task_list,(clist_head_t *)task->lAddr);
-		pmml_free(task);
+	if (task->kernelESP != 0) {
+		pmml_free((void *)task->kernelESP);
+	}
+	clist_delete_entry(task_list,(clist_head_t *)task->lAddr);
+	pmml_free(task);
 	}
 }
 int process_getProcesses() {

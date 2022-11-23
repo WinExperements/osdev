@@ -2,6 +2,7 @@
 #include "syscall.h"
 int main(int argc,char **argv) {
     if (argc < 2) {
+	printf("%u\n",argc);
         printf("mount: <fs type> <device path> <mount point>\n");
         return 0;
     }

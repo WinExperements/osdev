@@ -30,11 +30,6 @@ void vfs_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
         printf("vfs: file seems broken, or you trying to read don't exists file\n");
         return;
     } else {
-        dev_t *d;
-        if ((d = dev_find(node->name)) != NULL) {
-            d->read(buf,how);
-            return;
-        }
         node->read(node,offset,how,buf);
     }
 }
@@ -43,11 +38,6 @@ void vfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
         printf("vfs: file seems broken, or you trying to write to don't exists file\n");
         return;
     } else {
-        dev_t *d;
-        if ((d = dev_find(node->name)) != NULL) {
-            d->write(buf,how);
-            return;
-        }
         node->write(node,offset,how,buf);
     }
 }
@@ -80,15 +70,24 @@ vfs_node_t *vfs_finddir(vfs_node_t *in,char *name) {
 vfs_node_t *vfs_getRoot() {
     return fs_root;
 }
-void vfs_mount(vfs_node_t *root,char *mountPoint) {
-    if (!root) {
-        printf("%s: filesystem root are null!",__func__);
+void vfs_mount(vfs_fs_t *fs,char *mountPoint) {
+    if (!fs) {
+        printf("%s: filesystem are null!",__func__);
         return;
     }
     if (!mountPoint || mountPoint[0] != '/') {
         printf("%s: mount point are invalid",__func__);
     }
     if (strcmp(mountPoint,"/")) {
+	if (!fs->mount) {
+                printf("%s: filesystem mount function are not defined\n");
+                return;
+        }
+	vfs_node_t *root = fs->mount(NULL,NULL);
+        if (!root) {
+                printf("%s: filesystem mount failed\n");
+                return;
+        }
         fs_root = root;
     } else {
         vfs_node_t *mount_point = vfs_find(mountPoint);
@@ -100,7 +99,15 @@ void vfs_mount(vfs_node_t *root,char *mountPoint) {
 		return;
 	}
 	// call the actual mount function(if present)
-	//if (
+	if (!fs->mount) {
+		printf("%s: filesystem mount function are not defined\n");
+		return;
+	}
+	vfs_node_t *root = fs->mount(mount_point,NULL);
+        if (!root) {
+                printf("%s: filesystem mount failed\n");
+                return;
+        }
 	// replace all I/O functions with the root directory functions
 	mount_point->read = root->read;
 	mount_point->write = root->write;
@@ -207,4 +214,8 @@ vfs_fs_t *vfs_findFS(char *name) {
         start = start->next;
     }
     return NULL;
+}
+void *vfs_mmap(struct vfs_node *node,int addr,int size,int offset,int flags) {
+	if (!node || !node->mmap) return NULL;
+	return node->mmap(node,addr,size,offset,flags);
 }

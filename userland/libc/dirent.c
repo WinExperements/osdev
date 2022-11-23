@@ -5,8 +5,7 @@
 
 DIR *opendir(const char *path) {
     FILE *f = (FILE *)helin_syscall(18,(int)path,0,0,0,0);
-    if (!f) {
-        printf("dirent: opendir fail.\n");
+    if (f == NULL) {
         return 0;
     }
     DIR *d = malloc(sizeof(DIR));

@@ -10,6 +10,7 @@
 #include<io.h>
 #include<lib/clist.h>
 #include<symbols.h>
+#include<arch.h>
 void parseCommand(int argc,char *cmd[]);
 multiboot_info_t *info;
 vfs_node_t *kshell_tty;
@@ -116,9 +117,15 @@ void parseCommand(int argc,char *cmd[]) {
                     printf("cat: %s: is a directory\n",cmd[1]);
                 } else {
                     if (n->size != 0) {
-                        int pages = (n->size/4096)+1;
+			int f_size = (argc > 2 ? atoi(cmd[2]) : n->size);
+                        int pages = (f_size/4096)+1;
+			printf("Size: %d\n",f_size);
                         char *buf = pmml_allocPages(pages,true);
-                        vfs_read(n,0,n->size,buf);
+			if (!buf) {
+				printf("cat: no space left to read\n");
+				return;
+			}
+                        vfs_read(n,0,f_size,buf);
                         printf("%s\n",buf);
                         pmml_freePages(buf,pages);
                     }

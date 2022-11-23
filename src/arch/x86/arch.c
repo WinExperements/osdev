@@ -161,7 +161,7 @@ void x86_userSwitch(int entryPoint,int stack) {
     // before the actual switch, create and fill our arch_task
     if (__active != NULL) {
         x86_arch_task *a = pmml_alloc(true);
-        //a->iframe = (int)regs;
+        a->iframe = (int)regs;
         a->ustack = stack;
         __active->arch_task = (void *)a;
     }

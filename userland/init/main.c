@@ -67,7 +67,10 @@ void sh_parseCommand(char **argv,int argc) {
         } else {
             d = opendir(path);
         }
-        if (!d) return;
+        if (!d) {
+		printf("%s: I/O error\n",(argc > 1 ? argv[1] : path));
+		return;
+	}
         struct dirent *di = NULL;
         while((di = readdir(d)) != 0) {
             printf("%s\n",di->name);
@@ -161,6 +164,7 @@ bool execute(char *command,char **argv,int argc) {
         for (int i = 0; i < argc; i++) {
             new_argv[i] = argv[i];
         }
+	//printf("u %u\n",new_argc);
     }
     sprintf(buff,"%s/%s",run_path,command);
     if ((_pid = execv(buff,new_argc,new_argv)) > 0) {
