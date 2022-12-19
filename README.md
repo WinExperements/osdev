@@ -7,7 +7,7 @@ Current list of features and released components:
 - [x] Interrupts
 - [x] Memory Management, PMM
 - [x] Multitasking
-- [x] Module Loading
+- [x] Userspace program loading
 - [x] Multiboot structure loading
 - [x] User space [in this file](arch/x86/gdtfl.asm)
 - [x] Keyboard driver in user space
