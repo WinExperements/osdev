@@ -27,7 +27,6 @@ module_t *load_module(void *address) {
         || !module_reloc_symbols(mod,header)) {
             return NULL;
         }
-	printf("module init void address: %x\n",mod->init);
     return mod;
 }
 void *module_get_section_addr(module_t *mod,unsigned n) {
@@ -38,11 +37,10 @@ void *module_get_section_addr(module_t *mod,unsigned n) {
 			return seg->addr;
 		}
 	}
-	printf("%s: no section with id: %d\n",__func__,n);
 	return NULL;
 }
 bool module_resolve_name(module_t *mod,Elf32_Ehdr *header) {
-    Elf32_Shdr *s;
+    /*Elf32_Shdr *s;
     unsigned i;
     const char *str;
     s = (Elf32_Shdr *)((char *)header + header->e_shoff + header->e_shstrndx * header->e_shentsize);
@@ -63,6 +61,7 @@ bool module_resolve_name(module_t *mod,Elf32_Ehdr *header) {
         return false;
     }
     printf("%s: setted name: %s\n",__func__,mod->name);
+   */
     return true;
 }
 bool module_resolve_dep(module_t *mod,Elf32_Ehdr *e) {
@@ -152,14 +151,12 @@ bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *e) {
 			} else {
 				Elf32_Shdr *sh_hdr = (Elf32_Shdr *)(e + e->e_shoff + e->e_shentsize * mod->symtab[i].st_shndx);
 				sym->st_value += sh_hdr->sh_addr;
-				printf("Symbol name: %s, address: %x\n",name,sym->st_value);
 			} break;
 			case STT_FUNC:
 			sym->st_value += (Elf32_Addr) module_get_section_addr(mod,sym->st_shndx);
-			printf("Symbol name v2: %s, address: %x\n",name,sym->st_value);
-			if (bind != STB_LOCAL) {
+			/*if (bind != STB_LOCAL) {
 				printf("TODO: This function %s also need to be added to global symbols table\n",name);
-			}
+			}*/
 			if (strcmp(name,"module_main")) {
 				//printf("Module init found\n");
 				mod->init = (void (*)(module_t *))sym->st_value;
@@ -172,7 +169,6 @@ bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *e) {
 			sym->st_value = 0;
 			break;
 			default:
-			printf("Unknown symbol type: %d,%s\n",type,name);
 			return false;
 			break;
 		}

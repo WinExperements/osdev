@@ -254,3 +254,7 @@ void atapi_init() {
 	ata_device_detect(&ata_secondary_master);
 	ata_device_detect(&ata_secondary_slave);
 }
+// === Loading as module support! ===
+void module_main() {
+	atapi_init();
+}

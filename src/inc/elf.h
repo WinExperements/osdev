@@ -125,7 +125,10 @@ typedef struct {
 enum RtT_Types {
 	R_386_NONE		= 0, // No relocation
 	R_386_32		= 1, // Symbol + Offset
-	R_386_PC32		= 2  // Symbol + Offset - Section Offset
+	R_386_PC32		= 2,  // Symbol + Offset - Section Offset
+	R_386_PLT32		= 4, // L + A -P
+	R_386_GOTOFF		= 9,
+	R_386_GOTPC		= 10,
 };
 typedef struct {
 	Elf32_Word		p_type;

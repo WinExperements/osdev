@@ -18,7 +18,6 @@ CDROM or other boot media */
 #include <mstring.h>
 #include<elf.h>
 #include<dev.h>
-#include <atapi/atapi.h>
 #include<vfs.h>
 #include<initrd.h>
 #include<symbols.h>
@@ -104,7 +103,6 @@ extern void kernel_main(struct multiboot_info *multiboot) {
         	}
     	}
     	printf("Finishing up\n");
-   	atapi_init();
     	if (!disableStartInit) {
         	printf("Starting init\n");
         	if (!exec_init()) {

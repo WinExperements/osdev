@@ -190,7 +190,6 @@ bool arch_relocSymbols(module_t *mod,void *ehdr) {
 	for (i = 0,s = (Elf32_Shdr *)((char *)e + e->e_shoff); i < e->e_shnum;
 		i++,s = (Elf32_Shdr *)((char *)s + e->e_shentsize)) {
 			if (s->sh_type == SHT_REL) {
-				printf("Relocation segment\n");
 				module_segment_t *seg;
 				for (seg = mod->seg; seg; seg = seg->next) {
 					if (seg->section == s->sh_info) break;
@@ -216,6 +215,15 @@ bool arch_relocSymbols(module_t *mod,void *ehdr) {
 							case R_386_PC32:
 								*addr += (sym->st_value - (Elf32_Word)seg->addr - rel->r_offset);
 								break;
+							case R_386_PLT32:
+								printf("R_386_PLT32 didn't supported currently!\n");
+								return false;
+							case R_386_GOTOFF:
+								printf("R_386_GOTOFF didn't supported!\n");
+								return false;
+							case R_386_GOTPC:
+								printf("R_386_GOTPC didn't supported!\n");
+								return false; // need to be added!
 							default:
 							printf("Unknown relocation type!\n");
 							break;

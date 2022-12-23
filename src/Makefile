@@ -1,9 +1,9 @@
 ARCH=x86
-CCOPTIONS = -m32 -std=gnu99 -ffreestanding -Wall -Wextra -Wno-unused-parameter -Wint-to-pointer-cast -Wsign-compare -nostdlib -march=i486 -mtune=i486 -fno-stack-protector -g
+CCOPTIONS = -m32 -std=gnu99 -ffreestanding -Wall -Wextra -Wno-unused-parameter -Wint-to-pointer-cast -Wsign-compare -nostdlib -march=i486 -mtune=i486 -fno-stack-protector -g -DLEGACY_TERMINAL
 ASPARAMS =
 CCPATH = 
 OBJECTS = arch/$(ARCH)/boot.o arch/$(ARCH)/terminal.o kernel/kernel.o arch/$(ARCH)/io.o arch/$(ARCH)/serial.o arch/$(ARCH)/arch.o arch/$(ARCH)/gdt.o arch/$(ARCH)/gdtfl.o arch/x86/interrupts.o arch/x86/interruptsasm.o mm/mm.o mm/pmm.o arch/$(ARCH)/vmm.o kernel/mstring.o kernel/process.o kernel/syscall.o kernel/keyboard.o arch/x86/pic.o kernel/elf.o font.o kernel/dev.o ipc/message.o kernel/vfs.o kernel/initrd.o kernel/module.o kernel/kshell.o kernel/rootfs.o kernel/terminal.o lib/clist.o kernel/arch.o kernel/symbols.o
-MODULE_OBJS = module/atapi/atapi.o
+MODULE_OBJS =
 %.o: %.c
 	@echo [CC] $<
 	@$(CCPATH)gcc $(CCOPTIONS) -Iinc -Imodule -c -o $@ $<
@@ -22,6 +22,7 @@ all: $(OBJECTS) $(MODULE_OBJS)
 clean:
 	rm -rf $(OBJECTS) $(MODULE_OBJS) kernel.bin kernel.map myos.iso
 	rm -rf ../iso/boot/grub/kernel.bin ../iso/boot/init ../iso/boot/test
+	make -C module/atapi clean
 makeiso:
 	cp kernel.bin ../iso/boot/grub
 	grub-mkrescue -o ~/myos.iso ../iso
@@ -49,3 +50,5 @@ make-prg:
 	make -C ../userland/init
 	make -C ../userland/mount
 	make -C ../userland/windowserver
+modules:
+	make -C module/atapi
