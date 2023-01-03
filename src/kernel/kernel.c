@@ -31,6 +31,15 @@ bool verbose;
 bool disableStartInit;
 multiboot_info_t *_multiboot;
 void print_symbols();
+static void print_logo() {
+	printf(" _    _      _ _        ____   _____ \n"); 
+ 	printf("| |  | |    | (_)      / __ \\ / ____| \n");
+ 	printf("| |__| | ___| |_ _ __ | |  | | (___   \n");
+ 	printf("|  __  |/ _ \\ | | '_ \\| |  | |\\___ \\ \n");
+ 	printf("| |  | |  __/ | | | | | |__| |____) |    \n");
+ 	printf("|_|  |_|\\___|_|_|_| |_|\\____/|_____/ \n");
+        printf("                                     \n");                                
+}
 void parse_commandLine(char *commandline) {
     char *k = strtok(commandline," ");
     while(k != NULL) {
@@ -41,8 +50,8 @@ void parse_commandLine(char *commandline) {
     }
 }
 extern void kernel_main(struct multiboot_info *multiboot) {
-	printf("Helin OS kernel compiled at %s:%s ",__DATE__,__TIME__);
     _multiboot = multiboot; 
+    	print_logo();
 	if (!(multiboot->flags >> 6 & 0x1))
 	{
 		PANIC("No memory map");
@@ -59,9 +68,7 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 		ppml_init(multiboot,(uint32_t)kernel_end,(int)kernel_end-(int)kernel_start);
 		//PANIC("Must be at less one module(initrd) passed.");
 	}
-	printf("with %d MB memory\n",(pmml_getMaxBlocks()*4096)/1024/1024);
-    	symbols_init(multiboot);
-	printf("Initializing VMM and VFS\n");
+    symbols_init(multiboot);
 	vmm_init();
 	vfs_init();
 	rootfs_init();
@@ -69,24 +76,19 @@ extern void kernel_main(struct multiboot_info *multiboot) {
 	vfs_creat(vfs_getRoot(),"dev",VFS_DIRECTORY);
 	vfs_creat(vfs_getRoot(),"bin",VFS_DIRECTORY);
 	vfs_creat(vfs_getRoot(),"initrd",VFS_DIRECTORY);
-    	printf("Initializing process manager\n");
 	arch_disableIRQ();
 	process_init();
 	arch_enableIRQ();
-    	printf("Enabling VMM and Initializing keyboard\n");
 	vmm_load();
 	vmm_enable();
 	keyboard_init();
 	//atapi_init();
-   	 printf("Initializing devfs and tty's\n");
 	dev_init();
 	tty_init();
-    	printf("Initializing kshell\n");
 	kshell_init(multiboot);
-    	printf("Parsing command line\n");
+	//printf("CHECK IF THE MEMORY PROPERTLY MAPPED!\n");
 	char *cmdline = (char *)multiboot->cmdline;
 	parse_commandLine(cmdline);
-    	printf("Filling ramfs with modules\n");
     	vfs_node_t *dev = vfs_finddir(vfs_getRoot(),"bin");
     	if (!dev) {
         	printf("no /bin found, execution terminated\n");
@@ -100,16 +102,21 @@ extern void kernel_main(struct multiboot_info *multiboot) {
        		if (mod->cmdline != 0) {
             		vfs_node_t *in = vfs_creat(dev,(char *)mod->cmdline,0);
             		rootfs_insertModuleData(in,mod->mod_end-mod->mod_start,(char *)mod->mod_start);
+					int name_size = strlen((char *)mod->cmdline)-4;
+					if (strcmp((char *)mod->cmdline+name_size,".mod")) {
+						module_t *modu = load_module((void *)mod->mod_start);
+						if ((modu == NULL) || (!modu->init)) {
+							printf("Module broken, see console\n");
+						} else {
+							modu->init(modu);
+						}
+					}
         	}
     	}
-    	printf("Finishing up\n");
     	if (!disableStartInit) {
-        	printf("Starting init\n");
         	if (!exec_init()) {
             		printf("Failed, entering kshell\n");
             		process_create((int)kshell_main,false,"kshell",0,NULL);
-        	} else {
-            		printf("Init created\n");
         	}
     	} else {
         	process_create((int)kshell_main,false,"kshell",0,NULL);

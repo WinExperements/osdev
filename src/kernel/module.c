@@ -12,6 +12,7 @@ bool module_resolve_dep(module_t *,Elf32_Ehdr *);
 bool module_load_seg(module_t *mod,Elf32_Ehdr *);
 bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *);
 bool module_reloc_symbols(module_t *,Elf32_Ehdr *);
+module_t *mod_start;
 module_t *load_module(void *address) {
     Elf32_Ehdr *header = (Elf32_Ehdr *)address;
     module_t *mod = pmml_alloc(true);
@@ -27,6 +28,7 @@ module_t *load_module(void *address) {
         || !module_reloc_symbols(mod,header)) {
             return NULL;
         }
+    register_module(mod);
     return mod;
 }
 void *module_get_section_addr(module_t *mod,unsigned n) {
@@ -40,7 +42,7 @@ void *module_get_section_addr(module_t *mod,unsigned n) {
 	return NULL;
 }
 bool module_resolve_name(module_t *mod,Elf32_Ehdr *header) {
-    /*Elf32_Shdr *s;
+    Elf32_Shdr *s;
     unsigned i;
     const char *str;
     s = (Elf32_Shdr *)((char *)header + header->e_shoff + header->e_shstrndx * header->e_shentsize);
@@ -60,8 +62,7 @@ bool module_resolve_name(module_t *mod,Elf32_Ehdr *header) {
         printf("No module name\n");
         return false;
     }
-    printf("%s: setted name: %s\n",__func__,mod->name);
-   */
+    //printf("%s: setted name: %s\n",__func__,mod->name);
     return true;
 }
 bool module_resolve_dep(module_t *mod,Elf32_Ehdr *e) {
@@ -98,10 +99,11 @@ bool module_load_seg(module_t *mod,Elf32_Ehdr *e) {
                     switch (s->sh_type)
                     {
                         case 1: 
-                        memcpy(address,(void *)e + s->sh_offset,s->sh_size);
+                        memcpy(address,(char *)e + s->sh_offset,s->sh_size);
                         break;
                         case 8:
                         memset(address,0,s->sh_size);
+                        break;
                     }
                     seg->addr = address;
                 } else {
@@ -154,9 +156,9 @@ bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *e) {
 			} break;
 			case STT_FUNC:
 			sym->st_value += (Elf32_Addr) module_get_section_addr(mod,sym->st_shndx);
-			/*if (bind != STB_LOCAL) {
-				printf("TODO: This function %s also need to be added to global symbols table\n",name);
-			}*/
+			if (bind != STB_LOCAL) {
+				symbols_registerSymbolFromModule(name,sym->st_value);
+			}
 			if (strcmp(name,"module_main")) {
 				//printf("Module init found\n");
 				mod->init = (void (*)(module_t *))sym->st_value;
@@ -178,3 +180,17 @@ bool module_resolve_symbols(module_t *mod,Elf32_Ehdr *e) {
 bool module_reloc_symbols(module_t *mod,Elf32_Ehdr *e) {
     	return arch_relocSymbols(mod,(void *)e);
 }
+void register_module(module_t *mod) {
+	module_t *s = NULL;
+	if (mod_start == NULL) {
+		mod_start = mod;
+		return;
+	} else {
+		s = mod_start;
+		while(s->next != NULL) {
+			s = s->next;
+		}
+		s->next = mod;
+	}
+}
+

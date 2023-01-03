@@ -7,6 +7,7 @@
 #include<io.h>
 #include<process.h>
 #include<elf.h>
+#include <mstring.h>
 #define PUSH(tos,val) (*(-- tos) = val)
 void gpf_exc(registers_t *);
 void x86_userSwitch(int entryPoint,int user_esp);
@@ -16,6 +17,9 @@ typedef struct _x86_arch_task {
     int ustack;
 } x86_arch_task;
 struct process *__active;
+static registers_t x86_cpuid(int code);
+static void x86_docpuid();
+static char *cpu_name = "X86-compactable CPU";
 void arch_init(struct multiboot_info *info) {
 	terminal_initialize(info);
 	init_serial();
@@ -29,6 +33,8 @@ void arch_init(struct multiboot_info *info) {
 #ifdef DEBUG
     write_serialString("X86 i386 code initialized(debug mode)\r\n");
 #endif
+	// Get CPU name
+	x86_docpuid();
 }
 void arch_reset() {
 #ifdef DEBUG
@@ -233,4 +239,38 @@ bool arch_relocSymbols(module_t *mod,void *ehdr) {
 			}
 	}
 	return true;
+}
+static registers_t x86_cpuid(int code) {
+	registers_t r;
+	asm volatile("cpuid" : "=a" (r.eax),"=b" (r.ebx), "=c" (r.ecx), "=d" (r.edx):"0"(code));
+	return r;
+}
+static void x86_docpuid() {
+	registers_t r = x86_cpuid(0x00);
+	char line1[5];
+	line1[0] = ((char *) &r.ebx)[0];
+	line1[1] = ((char *) &r.ebx)[1];
+	line1[2] = ((char *) &r.ebx)[2];
+	line1[3] = ((char *) &r.ebx)[3];
+	line1[4] = '\0';
+	char line2[5];
+	line2[0] = ((char *) &r.ecx)[0];
+	line2[1] = ((char *) &r.ecx)[1];
+	line2[2] = ((char *) &r.ecx)[2];
+	line2[3] = ((char *) &r.ecx)[3];
+	line2[4] = '\0';
+		
+	char line3[5];
+	line3[0] = ((char *) &r.edx)[0];
+	line3[1] = ((char *) &r.edx)[1];
+	line3[2] = ((char *) &r.edx)[2];
+	line3[3] = ((char *) &r.edx)[3];
+	line3[4] = '\0';
+							
+	strcpy(cpu_name, line1);
+	strcat(cpu_name, line3);
+	strcat(cpu_name, line2);
+}
+char *arch_getCPUName() {
+	return cpu_name;
 }

@@ -117,9 +117,8 @@ void parseCommand(int argc,char *cmd[]) {
                     printf("cat: %s: is a directory\n",cmd[1]);
                 } else {
                     if (n->size != 0) {
-			int f_size = (argc > 2 ? atoi(cmd[2]) : n->size);
+			            int f_size = (argc > 2 ? atoi(cmd[2]) : n->size);
                         int pages = (f_size/4096)+1;
-			printf("Size: %d\n",f_size);
                         char *buf = pmml_allocPages(pages,true);
 			if (!buf) {
 				printf("cat: no space left to read\n");
@@ -252,6 +251,29 @@ void parseCommand(int argc,char *cmd[]) {
         while(me->state == PROCESS_WAITING) {}
     } else if (strcmp(cmd[0],"syms")) {
 	symbols_print();
+    } else if (strcmp(cmd[0],"cp")) {
+        if (argc > 2) {
+            // find files
+            vfs_node_t *file1 = vfs_find(cmd[1]);
+            if (!file1) {
+                printf("cp: %s: not found",cmd[1]);
+                return;
+            }
+            vfs_node_t *file2 = vfs_find(cmd[2]);
+            if (!file2) {
+                printf("cp: cannot stat: %s: no device\n",cmd[2]);
+                return;
+            }
+            // now allocate and read data from file1
+            int filesize = argc > 2 ? atoi(cmd[3]) : file1->size;
+            int size = (filesize/4096)+1;
+            void *data_f1 = pmml_allocPages(size,true);
+            vfs_read(file1,0,filesize,data_f1);
+            // now write to file2
+            vfs_write(file2,0,filesize,data_f1);
+            // Cleanup
+            pmml_freePages(data_f1,size);
+        }
     } else {
         printf("Unknown command: \"%s\"\n",cmd[0]);
     }

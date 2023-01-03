@@ -8,7 +8,7 @@ initrd_file_header_t *file_headers;
 vfs_node_t *initrd_root;
 vfs_node_t *initrd_dev;
 vfs_node_t *initrd_nodes;
-void initrd_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
+void initrd_read(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf);
 struct dirent *initrd_readdir(vfs_node_t *in,uint32_t index);
 vfs_node_t *initrd_finddir(vfs_node_t *root,char *name);
 struct dirent dirent;
@@ -44,7 +44,7 @@ void initrd_init(void *start) {
     }
     printf("initrd: files: %d\n",header->nfiles);
 }
-void initrd_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
+void initrd_read(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf) {
     initrd_file_header_t head = file_headers[node->inode];
     if (offset > head.length) {
         return;
@@ -87,6 +87,6 @@ vfs_node_t *initrd_getRoot() {
     return initrd_root;
 }
 void initrd_mount(char *mountPath) {
-    vfs_mount(initrd_root,mountPath);
+    vfs_mount(initrd_root,NULL,mountPath);
     printf("initrd: mounted as %s\n",mountPath);
 }

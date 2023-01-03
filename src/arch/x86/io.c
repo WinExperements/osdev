@@ -15,3 +15,6 @@ uint16_t io_readPortW(uint32_t port) {
     	asm("inw %w1, %w0": "=a"(result):"Nd"(port));
 	return result;
 }
+void x86_insw(uint16_t port, unsigned char *data, unsigned long size) {
+	asm volatile ("rep insw" : "+D" (data), "+c" (size) : "d" (port) : "memory");
+}

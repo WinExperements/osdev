@@ -44,9 +44,9 @@ void printf(char *format,...) {
 void tty_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buffer) {
   printf(buffer);
 }
-void tty_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
+void tty_read(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf) {
   char *buff = (char *)buf;
-  int i = 0;
+  uint64_t i = 0;
    while(i < (how-1)) {
     char c = keyboard_get();
     if (c == '\n') {

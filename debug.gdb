@@ -1,3 +1,3 @@
 target remote localhost:1234
-b arch_rellocSyms
+b x86_mapMem
 c

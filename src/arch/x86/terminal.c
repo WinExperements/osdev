@@ -31,7 +31,7 @@ void terminal_initialize(struct multiboot_info *info) {
 	vgaW = info->framebuffer_width;
 	vgaH = info->framebuffer_height;
 	vgaP = info->framebuffer_pitch;
-  vgaBpp = info->framebuffer_bpp;
+  	vgaBpp = info->framebuffer_bpp/8;
   #ifndef LEGACY_TERMINAL
 	ws_row = vgaH/16;
  	ws_col = vgaW/9;

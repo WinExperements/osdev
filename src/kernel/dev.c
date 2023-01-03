@@ -21,6 +21,8 @@ void dev_add(dev_t *dev) {
     fil->read = dev->read;
     fil->write = dev->write;
     fil->mmap = dev->mmap;
+    fil->readBlock = dev->readBlock;
+    fil->device = dev->device;
     if (!device) {
         device = dev;
     } else {

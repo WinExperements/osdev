@@ -1,10 +1,13 @@
 #include <terminal.h>
-#include<io.h>
-#include<atapi/atapi.h>
-#include<serial.h>
-#include<dev.h>
-#include<mm/pmm.h>
-#include<interrupts.h>
+#include <io.h>
+#include <atapi/atapi.h>
+#include <serial.h>
+#include <dev.h>
+#include <mm/pmm.h>
+#include <interrupts.h>
+#include <mstring.h>
+// === Add module name here ===
+char modname[] __attribute__((section(".modname"))) = "atapi";
 // === Internal functions here ===
 typedef struct {
 	uint16_t flags;
@@ -111,15 +114,21 @@ typedef struct {
 #define ATA_REG_CONTROL    0x0C
 #define ATA_REG_ALTSTATUS  0x0C
 #define ATA_REG_DEVADDRESS 0x0D
-ata_device_t ata_primary_master   = {.base = 0x1F0, .ctrl = 0x3F6, .slave = 0};
-ata_device_t ata_primary_slave    = {.base = 0x1F0, .ctrl = 0x3F6, .slave = 1};
-ata_device_t ata_secondary_master = {.base = 0x170, .ctrl = 0x376, .slave = 0};
-ata_device_t ata_secondary_slave  = {.base = 0x170, .ctrl = 0x376, .slave = 1};
-void ata_create_device(bool hda);
-void ata_vdev_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
-void ata_vdev_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
-char ata_start_char = 'a';
-char ata_cdrom_char = 'a';
+static ata_device_t ata_primary_master   = {.base = 0x1F0, .ctrl = 0x3F6, .slave = 0};
+static ata_device_t ata_primary_slave    = {.base = 0x1F0, .ctrl = 0x3F6, .slave = 1};
+static ata_device_t ata_secondary_master = {.base = 0x170, .ctrl = 0x370, .slave = 0};
+static ata_device_t ata_secondary_slave  = {.base = 0x170, .ctrl = 0x370, .slave = 1};
+static ata_device_t ata_channel2_master  = {.base = 0x168, .ctrl = 0x360, .slave = 0};
+static ata_device_t ata_channel2_slave  = {.base = 0x168, .ctrl = 0x360, .slave = 1};
+static ata_device_t ata_channel3_master = {.base = 0x1e8, .ctrl = 0x3e0, .slave = 0};
+static ata_device_t ata_channel3_slave = {.base = 0x1e8, .ctrl = 0x3e0, .slave = 1};
+void ata_create_device(bool hda,ata_device_t *dev);
+void ata_vdev_read(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf);
+void ata_vdev_write(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf);
+int ata_print_error(ata_device_t *dev);
+static char ata_start_char = 'a';
+static char ata_cdrom_char = 'a';
+static uint64_t next_lba = 0;
 void ata_io_wait(ata_device_t *dev) {
 	io_readPort(dev->base+ATA_REG_ALTSTATUS);
 	io_readPort(dev->base+ATA_REG_ALTSTATUS);
@@ -139,7 +148,7 @@ int ata_status_wait(ata_device_t *dev,int timeout) {
 int ata_wait(ata_device_t *dev,int advanced) {
 	uint8_t status;
 	ata_io_wait(dev);
-	status = ata_status_wait(dev,-1); // wait forever!!
+	status = ata_status_wait(dev,10000); // wait forever!!
 	if (advanced) {
 		status = io_readPort(dev->base+ATA_REG_STATUS);
 		if (status & ATA_SR_ERR) return true;
@@ -166,13 +175,50 @@ bool ata_device_init(ata_device_t *dev) {
 	io_writePort(dev->ctrl,0);
 	io_writePort(dev->base+ATA_REG_HDDEVSEL, 0xA0 | dev->slave << 4);
 	ata_io_wait(dev);
+	/*if (io_readPort(dev->base+ATA_REG_STATUS) != 0x50) {
+		printf("Softreset failed(device not present): %x\n",io_readPort(dev->base+ATA_REG_STATUS));
+		return false;
+	}*/
+	//uint8_t tmpStatus = io_readPort(dev->base+ATA_REG_STATUS);
+	io_writePort(dev->base+ATA_REG_LBA0,0);
+	io_writePort(dev->base+ATA_REG_LBA1,0);
+	io_writePort(dev->base+ATA_REG_LBA2,0);
 	io_writePort(dev->base+ATA_REG_COMMAND,ATA_CMD_IDENTIFY);
 	ata_io_wait(dev);
-	io_readPort(dev->base+ATA_REG_COMMAND);
-	bool err = ata_wait(dev,1);
-	if (err) {
-		printf("ATA: device error\n");
+	//io_writePort(dev->base+ATA_REG_COMMAND,ATA_CMD_CACHE_FLUSH); //test
+	if (io_readPort(dev->base+ATA_REG_STATUS) == 0) {
+		printf("Media not present.\n");
 		return false;
+	}
+	unsigned char status,err,type;
+	while(io_readPort(dev->base+ATA_REG_STATUS) & ATA_SR_BSY ) {
+		/*if ((io_readPort(dev->base+ATA_REG_LBA1) != 0) && (io_readPort(dev->base+ATA_REG_LBA2) != 0)) {
+			printf("Disk not present or this isn't ATA device\n");
+			return false;
+		}*/
+		// wait for BSY to be cleared 
+	}
+	// Advanced check for errors
+	status = io_readPort(dev->base+ATA_REG_STATUS);
+	if (status & ATA_SR_ERR) {
+		err = true;
+	}
+	if (status & ATA_SR_DF) {
+		printf("Device fault %x\n",status);
+		err = true;
+	}
+	if ((status & ATA_SR_DRQ) == 0) {
+		printf("Isn't ATA probing ATAPI\n");
+		io_writePort(dev->base+ATA_REG_COMMAND,ATA_CMD_IDENTIFY_PACKET);
+		ata_io_wait(dev);
+		dev->type = IDE_ATAPI;
+	}
+	if (err) {
+		int error;
+		if ((error = ata_print_error(dev)) != 0) {
+			printf("ATA: device error: %x\n",error);
+			return false;
+		}
 	}
 	uint16_t *buf = (uint16_t *)&dev->identify;
 	for (int i = 0; i < 256; i++) {
@@ -188,41 +234,100 @@ bool ata_device_init(ata_device_t *dev) {
 }
 int ata_device_detect(ata_device_t *dev) {
 	ata_soft_reset(dev);
-	ata_io_wait(dev);
-	io_writePort(dev->base+ATA_REG_HDDEVSEL,0xA0 | dev->slave << 4);
-	ata_io_wait(dev);
-	ata_status_wait(dev,10000);
-	unsigned char cl = io_readPort(dev->base + ATA_REG_LBA1);
-	unsigned char ch = io_readPort(dev->base + ATA_REG_LBA2);
-	if (ch == 0xff && cl == 0xff) {
-		printf("ATA: drive not present\n");
-		return 0;
+	while(1) {
+		uint8_t status = io_readPort(dev->base+ATA_REG_STATUS);
+		if (!(status & ATA_SR_BSY)) break;
 	}
-	if ((cl == 0x00 && ch == 0x00) || (cl == 0x3c && ch == 0xc3)) {
-		if (!ata_device_init(dev)) return 0;
-		int sectors = ata_max_offset(dev);
-		if (sectors == 0) {
-			// ATA must have at less 1 sector(512B)
-			printf("ATA: device sectors are zero!\n");
-			return 0;
-		}
-		printf("ATA: detected drive: %s, serial: %s\n",dev->identify.model,dev->identify.serial);
-		ata_create_device(true);
-	} else if ((cl == 0x14 && ch == 0xEB) || (cl == 0x69 && ch == 0x96)) {
-		printf("ATA: cdrom found\n");
-		ata_create_device(false);
-	} else {
-		printf("ATA: unknown cl and ch return values %x %x\n",cl,ch);
+	if (ata_device_init(dev)) {
+		printf("ATA name: %s\n",dev->identify.model);
+		ata_create_device(true,dev);
 	}
 	return 0;
 }
-void ata_vdev_read(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
-	printf("ATA: read didn't supported!\n");
+/* This is a test read and comming soon will be fixed */
+void ata_vdev_read(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf) {
+	printf("ATA: use readBlock!\n");
+	return;
 }
-void ata_vdev_write(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf) {
-	printf("ATA: write didn't supported\n");
+/* Only for DEVELOPERS! */
+void ata_vdev_write(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf) {
+	// Convert void * to uint8_t *
+	uint8_t *target = (uint8_t *)buf;
+	uint64_t lba = 0;
+	uint16_t sectors = how/512;
+	if (sectors == 0) sectors = 1;
+	printf("Writing %d sectors to drive\n",sectors);
+	ata_device_t *dev = &ata_primary_master;
+	io_writePort(dev->base+ATA_REG_HDDEVSEL,0x40);
+	io_writePort(dev->base+ATA_REG_SECCOUNT0,(sectors >> 8) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA0,(lba >> 24) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA1,(lba >> 32) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA2,(lba >> 40) & 0xFF);
+	io_writePort(dev->base+ATA_REG_SECCOUNT0,sectors & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA0,lba & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA1,(lba >> 8) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA2,(lba >> 16) & 0xFF);
+	io_writePort(dev->base+ATA_REG_COMMAND,ATA_CMD_WRITE_PIO_EXT); // ATA_CMD_WRITE_PIO_EXT
+	uint8_t i;
+	for (i = 0; i < sectors; i++) {
+		while(1) {
+			uint8_t status = io_readPort(dev->base+ATA_REG_STATUS);
+			if (status & ATA_SR_DRQ) {
+				// Drive is ready to transfer data
+				break;
+			} else if (status & ATA_SR_ERR) {
+				printf("ATA: Disk error. Cancel\n");
+				return;
+			}
+		}
+		// Tranfer data over PIO
+		for (int u = 0; u < 256; u++) {
+			io_writePortW(dev->base+ATA_REG_DATA,target[u]);
+		}
+		target+=256;
+	}
+	// flush the cache
+	io_writePort(dev->base+ATA_REG_COMMAND,ATA_CMD_CACHE_FLUSH);
+	while(io_readPort(dev->base+ATA_REG_STATUS) & ATA_SR_BSY) {}
 }
-void ata_create_device(bool hda) {
+static void ata_vdev_readBlock(vfs_node_t *node,int blockNo,int how, void *buf) {
+	ata_device_t *dev = &ata_primary_master;
+	if (dev->type == IDE_ATAPI) {
+		printf("Currently doesn't supported!\n");
+		return;
+	}
+	uint64_t lba = blockNo;
+	uint16_t sectors = how/512;
+	printf("ATA: Reading sector %d\n",lba);
+	if (sectors == 0) sectors = 1;
+	io_writePort(dev->base+ATA_REG_HDDEVSEL,0x40);
+	io_writePort(dev->base+ATA_REG_SECCOUNT0,(sectors >> 8) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA0,(lba >> 24) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA1,(lba >> 32) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA2,(lba >> 40) & 0xFF);
+	io_writePort(dev->base+ATA_REG_SECCOUNT0,sectors & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA0,lba & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA1,(lba >> 8) & 0xFF);
+	io_writePort(dev->base+ATA_REG_LBA2,(lba >> 16) & 0xFF);
+	io_writePort(dev->base+ATA_REG_COMMAND,ATA_CMD_READ_PIO_EXT); // ATA_CMD_READ_PIO_EXT
+	uint8_t i;
+	// convert buffer
+	uint8_t *bu = (uint8_t *)buf;
+	printf("ATA: Converted buffer address: %x\n",bu);
+	for (i = 0; i < sectors; i++) {
+		while(1) {
+			uint8_t status = io_readPort(dev->base+ATA_REG_STATUS);
+			if (status & ATA_SR_DRQ) {
+				// Disk is ready to transfer data
+				break;
+			}
+		}
+		x86_insw(dev->base,bu,256);
+		bu+=256;
+	}
+	printf("ATA: Reading done!\n");
+}
+void ata_create_device(bool hda,ata_device_t *dev) {
 	char *name;
 	if (hda) {
 		name = "hd ";
@@ -242,19 +347,36 @@ void ata_create_device(bool hda) {
 	disk->name = name;
 	disk->write = ata_vdev_write;
 	disk->read = ata_vdev_read;
-	disk->buffer_sizeMax = 1; // didn't supportes so 1
+	disk->buffer_sizeMax = 512; // default sector size
+	disk->device = dev;
+	disk->readBlock = ata_vdev_readBlock;
 	// Now register device in our DEVFS
 	dev_add(disk);
 }
 // === Public functions here ===
 void atapi_init() {
 	printf("ATA device driver\n");
+	//printf("Detecting on channel 0\n");
 	ata_device_detect(&ata_primary_master);
 	ata_device_detect(&ata_primary_slave);
+//	printf("Detecting on channel 1\n");
 	ata_device_detect(&ata_secondary_master);
 	ata_device_detect(&ata_secondary_slave);
+	/*printf("Detecting on channel 2\n");
+	ata_device_detect(&ata_channel2_master);
+	ata_device_detect(&ata_channel2_slave);
+	printf("Detecting on channel 3\n");
+	ata_device_detect(&ata_channel3_master);
+	ata_device_detect(&ata_channel3_slave);*/
 }
 // === Loading as module support! ===
-void module_main() {
+static void module_main() {
 	atapi_init();
+}
+int ata_print_error(ata_device_t *dev) {
+	uint8_t type = io_readPort(dev->base + ATA_REG_ERROR);
+	if (type == 0) {printf("No error reported\n"); return type;}
+	if (type == 0xff) {printf("Media not present but returned error\n"); return type;}
+	printf("ATA error type: %x\n",type);
+	return type;
 }

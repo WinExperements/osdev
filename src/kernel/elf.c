@@ -43,13 +43,8 @@ bool elf_load_file(void *file,bool isUser,char *name,int argc,char **argv,char *
 	case 2:
 	break;
 	case 1: {
-        module_t *module = load_module(file);
-        if (!module || !module->init) {
-            printf("Failed to load module\n");
-            return false;
-        }
-        module->init(module);
-        return true;
+	printf("The file type is relocable and can't be runned, please use insmod or something to do this\n");
+        return false;
     }
 	break;
 	default:

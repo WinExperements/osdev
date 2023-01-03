@@ -1,4 +1,4 @@
-/** Physical Page Allocator  **/
+/** Physical Page Memory Allocator  **/
 
 #include<mm/pmm.h>
 #include<mm.h>
@@ -9,6 +9,7 @@
 uint32_t main_memory_size;
 uint16_t *bitmap;
 uint32_t max_blocks,free_blocks,used_blocks;
+int mem_start,mem_end;
 void mmap_set(int index,bool set) {
 	if (set) {
 		bitmap[index] = 255;
@@ -67,7 +68,9 @@ void ppml_init(struct multiboot_info *info,uint32_t _endkernel,uint32_t kernel_s
 	for (int i = 0; i < max_blocks; i++) {
 		mmap_set(i,true);
 	}
-	pmml_initRegion((_endkernel+bitmapSize)+0x1000,size);
+	mem_start = (_endkernel+bitmapSize)+0x1000;
+	mem_end = mem_start + size;
+	pmml_initRegion(mem_start,size);
 #ifdef DEBUG
     write_serialString("pmm: initialized ");
     write_serialHex(_endkernel+bitmapSize);
@@ -145,18 +148,23 @@ void *pmml_allocPages(int count,bool clear) {
 			mmap_set(0,true);
 			return pmml_allocPages(count,clear);
 		}
+		if (frame+count > pmml_getFreeBlocks()) {
+			printf("PMM: Out of bounds\n");
+			return NULL;
+		}
 		for (int i = 0; i < count; i++) {
-            if (mmap_test(frame+i)) {
-                /*
-                 * This means that PMM dealocated some of memory
-                 * but some of that are allocated too,
-                 * so find normal unused memory by recursion,
-                 * while we don't return out of memory exc
-                 * eption, or valid address
-                 */
-                return pmml_allocPages(count,clear);
-            }
-            mmap_set(frame+i,true);
+            		if (mmap_test(frame+i)) {
+               			/*
+                 		* This means that PMM dealocated some of memory
+                 		* but some of that are allocated too,
+                 		* so find normal unused memory by recursion,
+                 		* while we don't return out of memory exc
+                 		* eption, or valid address
+                 		*/
+				//PANIC("PMM: Requsted pages didn't fit");
+                		return pmml_allocPages(count,clear);
+            		}
+            		mmap_set(frame+i,true);
 		}
 		uint32_t addr = frame*4096;
 		used_blocks+=count;
@@ -185,6 +193,7 @@ void pmml_initRegion(uint32_t address,uint32_t size) {
 		used_blocks--;
 	}
 	mmap_set(0,true);
+	printf("PMM: Initialized region from %d to %d\n",address/4096,(address+size/4096));
 }
 int pmml_getFreeBlocks() {
 	return max_blocks-used_blocks;
@@ -193,4 +202,10 @@ bool pmml_isPageAllocated(void *page) {
     int a = (int)page;
     int frame = a/4096;
     return mmap_test(frame);
+}
+int pmml_getMemStart() {
+	return mem_start;
+}
+int pmml_getMemEnd() {
+	return mem_end;
 }

@@ -9,11 +9,11 @@ vfs_node_t *root;
 vfs_fs_t *rootfs_fs;
 struct dirent rootfs_dirent;
 int files = 0;
-void rootfs_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
+void rootfs_read(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf);
 struct dirent *rootfs_readdir(vfs_node_t *in,uint32_t index);
 vfs_node_t *rootfs_finddir(vfs_node_t *root,char *name);
 vfs_node_t *rootfs_creat(vfs_node_t *node,char *name,int flags);
-void rootfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
+void rootfs_write(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf);
 void rootfs_truncate(vfs_node_t *in,int size);
 void rootfs_close(vfs_node_t *in);
 vfs_node_t *__rootfs_mount(vfs_node_t *,void *);
@@ -36,7 +36,7 @@ void rootfs_init() {
     vfs_addFS(rootfs_fs);
     data = pmml_alloc(true);
 }
-void rootfs_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
+void rootfs_read(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf) {
     if ((node->flags & 0x7) != VFS_DIRECTORY) {
         memcpy(buf,data[node->inode],how);
     }
@@ -98,9 +98,9 @@ vfs_node_t *rootfs_creat(vfs_node_t *node,char *name,int flags) {
     return newDir;
 }
 void rootfs_mount(char *to) {
-    vfs_mount(rootfs_fs,to);
+    vfs_mount(rootfs_fs,NULL,to);
 }
-void rootfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf) {
+void rootfs_write(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf) {
     char *buff = pmml_allocPages((how/4096)+1,true);
     memcpy(buff+offset,buf+offset,how-offset);
     data[node->inode] = buff;

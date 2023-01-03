@@ -14,4 +14,7 @@ void pmml_deinit_region(uint32_t address,uint32_t size);
 /* Returns count of free blocks of memory */
 int pmml_getFreeBlocks();
 bool pmml_isPageAllocated(void *page);
+/* Function that must be used to map all memory! */
+int pmml_getMemStart(); // Return start address of memory
+int pmml_getMemEnd(); // Return size of detected memory
 #endif

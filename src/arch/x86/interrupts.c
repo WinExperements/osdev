@@ -115,16 +115,16 @@ void isr_handler(registers_t *regs) {
     int int_no = regs->int_no;
     struct process *prc = process_getProcess(process_getCurrentPID());
     if (prc != NULL && prc->user) {
+    	if (int_no == 14) {
+		int addr = 0;
+		asm volatile("movl %0,%%cr2" : "=r"(addr));
+		printf("Addr: %x\n",addr);
+	}
         printf("%s in process %d\n",exception_names[int_no],prc->pid);
         process_kill(prc->pid);
         arch_enableInterrupts();
         process_yield();
     } else {
-	if (int_no == 14) {
-		int addr = 0;
-		asm volatile("movl %0,%%cr2" : "=r"(addr));
-		printf("Addr: %x\n",addr);
-	}
         PANIC(exception_names[int_no]);
     }
 }

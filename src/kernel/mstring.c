@@ -1,5 +1,6 @@
 #include<mstring.h>
 #include<mm/pmm.h>
+static char *oldword = 0;
 void memcpy(void *vd, const void *vs, unsigned length) {
 	char *d = vd;
 	const char *s = vs;
@@ -50,7 +51,6 @@ const char *strchr(const char *s, char ch)
 
 char *strtok(char *s, const char *delim)
 {
-	static char *oldword = 0;
 	char *word;
 
 	if(!s)
@@ -60,7 +60,8 @@ char *strtok(char *s, const char *delim)
 		s++;
 
 	if(!*s) {
-		oldword = s;
+		if (!oldword) oldword = pmml_alloc(true);
+		strcpy(oldword,s);
 		return 0;
 	}
 
@@ -99,4 +100,16 @@ int atoi(char *number) {
         number++;
     }
     return value;
+}
+extern char* strcat(char* s1, const char* s2)
+{
+    char* original = s1;
+
+    while (*s1 != '\0')
+        s1++;
+    while (*s2 != '\0')
+        *s1++ = *s2++;
+    *s1 = '\0';
+
+    return original;
 }

@@ -31,4 +31,5 @@ void arch_switchContext(void *newStack) __attribute__((cdecl));
 void arch_switchToUser();
 void arch_set_active_thread(struct process *active);
 bool arch_relocSymbols(module_t *mod,void *ehdr);
+char *arch_getCPUName();
 #endif

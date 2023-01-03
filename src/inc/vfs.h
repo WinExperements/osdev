@@ -10,8 +10,8 @@ typedef struct vfs_node {
     uint32_t flags;
     uint32_t inode;
     uint32_t size;
-    void (*read)(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
-    void (*write)(struct vfs_node *node,uint32_t offset,uint32_t how,void *buf);
+    void (*read)(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf);
+    void (*write)(struct vfs_node *node,uint64_t offset,uint64_t how,void *buf);
     void (*open)(struct vfs_node *node,bool w,bool r);
     void (*close)(struct vfs_node *node);
     struct vfs_node *(*finddir)(struct vfs_node *in,char *name);
@@ -25,6 +25,7 @@ typedef struct vfs_node {
     struct vfs_node *prev;
     struct vfs_node *first_child;
     struct vfs_node *next_child;
+    void *device;
 } vfs_node_t;
 struct dirent {
     char name[128];
@@ -32,7 +33,7 @@ struct dirent {
 };
 typedef struct vfs_fs {
     char *fs_name;
-    struct vfs_node *(*mount)(struct vfs_node *,void *);
+    struct vfs_node *(*mount)(struct vfs_node *dev,void *);
     struct vfs_fs *next;
 } vfs_fs_t;
 typedef struct file_descriptor {
@@ -46,14 +47,14 @@ typedef struct file_descriptor {
 void vfs_init();
 void vfs_addFS(vfs_fs_t *fs);
 vfs_fs_t *vfs_findFS(char *name);
-void vfs_read(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
-void vfs_write(vfs_node_t *node,uint32_t offset,uint32_t how,void *buf);
+void vfs_read(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf);
+void vfs_write(vfs_node_t *node,uint64_t offset,uint64_t how,void *buf);
 void vfs_open(vfs_node_t *node,bool w,bool r);
 void vfs_close(vfs_node_t *node);
 struct dirent *vfs_readdir(vfs_node_t *in,uint32_t index);
 vfs_node_t *vfs_finddir(vfs_node_t *in,char *name);
 vfs_node_t *vfs_getRoot();
-void vfs_mount(vfs_fs_t *fs,char *mountPoint);
+void vfs_mount(vfs_fs_t *fs,vfs_node_t *dev,char *mountPoint);
 vfs_node_t *vfs_creat(vfs_node_t *in,char *name,int flags);
 void rootfs_init();
 void rootfs_mount(char *to);

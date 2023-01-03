@@ -123,27 +123,27 @@ int *vmm_createDirectory() {
   /* Clone the kernel directory then return */
   int *directory = pmml_allocPages(2,true);
   int *bios = pmml_allocPages(2,true);
-  int *gb3 = pmml_allocPages(2,true);
   int *frameBuffer = pmml_allocPages(2,true);
-  if (directory == NULL || bios == NULL || gb3 == NULL || frameBuffer == NULL) {
+  int *p3gb = pmml_allocPages(2,true);
+  if (directory == NULL || bios == NULL || frameBuffer == NULL) {
     PANIC("vmm_createTable: NuLL");
   }
   for (int i = 0,frame=0x0, virt=0x00000000; i < 1024; i++,frame+=4096, virt+=4096) {
     bios[PAGE_TABLE_INDEX(virt)] = (frame) | 7;
   }
-  bios[PAGE_TABLE_INDEX(0)] = (0) | 3; // secure address 0 for writing/reading from user-space programs
   for (int i=0, frame=0x100000, virt=0xc0000000; i<1024; i++, frame+=4096, virt+=4096) {
-    gb3[PAGE_TABLE_INDEX(virt)] = (frame) | 7;
+    p3gb[PAGE_TABLE_INDEX(virt)] = (frame) | 7;
    }
+  bios[PAGE_TABLE_INDEX(0)] = (0) | 3; // secure address 0 for writing/reading from user-space programs
    #ifndef LEGACY_TERMINAL
    for (int i = terminal_getBufferAddress(); i < (terminal_getBufferAddress()+terminal_getBufferSize())+4096; i+=4096) {
     frameBuffer[PAGE_TABLE_INDEX(i)] = (i) | 7;
    }
    directory[PAGE_DIRECTORY_INDEX(terminal_getBufferAddress())] = ((unsigned int)frameBuffer) | 7;
+   directory[PAGE_DIRECTORY_INDEX(0xc0000000)] = ((unsigned int)p3gb) | 7;
    #endif
    /* Fill table with the specific data */
    directory[0] = ((unsigned int)bios) | 7;
-   directory[PAGE_DIRECTORY_INDEX(0xc0000000)] = ((unsigned int)gb3) | 7;
    /* Now return */
    return directory;
 }

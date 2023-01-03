@@ -13,6 +13,7 @@
 #include<arch.h>
 #include<serial.h>
 #include<kshell.h>
+#include <module.h>
 static void *syscalls[] = {
 	0,
 	&sys_print,
@@ -36,19 +37,21 @@ static void *syscalls[] = {
 	&sys_closedir,
 	&sys_readdir,
 	&sys_exec_shell,
-        &sys_waitpid,
-        &sys_getppid,
-        &sys_sysinfo,
-        &sys_getuid,
-        &sys_setuid,
+    &sys_waitpid,
+    &sys_getppid,
+    &sys_sysinfo,
+    &sys_getuid,
+    &sys_setuid,
 	&sys_seek,
 	&sys_tell,
-	&sys_mmap
+	&sys_mmap,
+	&sys_insmod,
+	&sys_rmmod
 };
 int _global_fd = 0;
 registers_t *syscall_handler(registers_t *regs) {
 	arch_enableInterrupts();
-	if (regs->eax > 29) {
+	if (regs->eax > 32) {
 		printf("No such syscall number: %d\n",regs->eax);
 	} else {
 		int (*handler)(int,int,int,int,int) = (int (*)(int,int,int,int,int))syscalls[regs->eax];
@@ -237,14 +240,14 @@ int sys_exec_shell(int p1,int p2,int p3,int p4,int p5) {
 	char *_fs = copy_from_user((void *)p3);
 	vfs_node_t *dev_path = vfs_find(dev);
     	if (dev_path == NULL) {
-		pmml_free(dev);
+				pmml_free(dev);
                 pmml_free(_mount_dir);
                 pmml_free(_fs);
-		return -2;
-	}
+				return -2;
+		}
     	vfs_node_t *mount_dir = vfs_find(_mount_dir);
     	if (mount_dir == NULL) {
-		pmml_free(dev);
+				pmml_free(dev);
                 pmml_free(_mount_dir);
                 pmml_free(_fs);
 		return -3;
@@ -257,7 +260,7 @@ int sys_exec_shell(int p1,int p2,int p3,int p4,int p5) {
 		return -4;
 	}
 	// try to mount here
-	vfs_mount(fs,_mount_dir);
+	vfs_mount(fs,dev_path,_mount_dir);
 	pmml_free(dev);
 	pmml_free(_mount_dir);
 	pmml_free(_fs);
@@ -331,4 +334,29 @@ int sys_mmap(int fd,int addr,int size,int offset,int flags) {
 		return (int)vfs_mmap(n,addr,size,offset,flags);
 	}
 	return 0;
+}
+int sys_insmod(int path,int u1,int u2,int u3,int u4) {
+	if (path == 0) return -5;
+	char *p = copy_from_user((void *)path);
+	vfs_node_t *node = NULL;
+	if ((node = vfs_find(p)) == NULL) {
+		pmml_free(p);
+		return -1;
+	}
+	// now allocate and read the data from file
+	pmml_free(p);
+	int size = (node->size/4096)+1;
+	void *data = pmml_allocPages(size,true);
+	vfs_read(node,0,node->size,data);
+	module_t *mod = load_module(data);
+	if (!mod || !mod->init) {
+		pmml_freePages(data,size);
+		return -2; // module loading failed, see console for more details
+	}
+	mod->init(mod);
+	return 0;
+}
+int sys_rmmod(int name,int u1,int u2,int u3,int u4) {
+	printf("Syscall API \"rmmod\" doesn't implemented!");
+	return -1;
 }

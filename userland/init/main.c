@@ -137,6 +137,18 @@ void sh_parseCommand(char **argv,int argc) {
 		}
 		printf("\n");
 	    }
+    } else if (!strcmp(argv[0],"insmod")) {
+	if (argc > 1) {
+		int ret = helin_syscall(30,(int)argv[1],0,0,0,0);
+		if (ret == -2) {
+			printf("Module %s loading failed please see console for more details\n",argv[1]);
+		} else if (ret == -1) {
+			printf("Fiie %s not found and can't be loaded!\n",argv[1]);
+		}
+	} else {
+		printf("insmod - builtin function for installing and running kernel modules/drivers from shell\n");
+		printf("Usage:	insmod <module path>\n");
+	}
     } else {
         if (!execute(argv[0],argv,argc)) {
             printf("Commmand %s not found\n",argv[0]);
