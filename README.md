@@ -1,6 +1,5 @@
 # IMPORTANT!!
-Project halted, because I have big problems with the PMM, see issues for more details.
-Maybe I don't return to this, sorry
+When I implement all that I write in the TODO, maybe I close the project, don't forget that you can use the project for education purpose!
 # About
 A hobby operation system written in C and assembly for X86 i386 PC.<br>
 You can use source of this project :)<br>
