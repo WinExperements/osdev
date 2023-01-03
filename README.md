@@ -1,3 +1,5 @@
+# IMPORTANT!!
+Project halted, because I have big problems with the PMM, see issues for more details. If you fixed that please do pull request and I continue development.
 # About
 A hobby operation system written in C and assembly for X86 i386 PC.<br>
 You can use source of this project :)<br>
